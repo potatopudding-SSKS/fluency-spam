@@ -59,10 +59,10 @@ var maininstructions = {
   <p style="font-size:18px;"> एक प्रैक्टिस वर्बल फ्लुएंसी और स्थानिक व्यवस्था टास्क करें और ज़्यादा विस्तृत निर्देश दें।</p>
 
 
-  <p style="font-size:18px;"> जब आप शुरू करने के लिए तैयार हों, <strong>"Continue " दबाएँ।</strong></p>
+  <p style="font-size:18px;"> जब आप शुरू करने के लिए तैयार हों, <strong>"कंटिन्यू  " दबाएँ।</strong></p>
 
   `,
-  choices: ["Continue"],
+  choices: ["कंटिन्यू "],
   on_load: function() {
     clearInterval(timerInterval);
     resetCountdown();
@@ -92,10 +92,10 @@ var VFTInstructions = {
   <p style="font-size:17px;"> हर शब्द टाइप करने के बाद, अगला शब्द टाइप करने के लिए <strong>ENTER</strong> दबाएँ।</p>
   <p style="font-size:17px;"> जब टाइमर खत्म हो जाएगा, तो आप अपने आप अगले टास्क पर चले जाएंगे।</p>
 
-  <p style="font-size:17px;"> जब आप तैयार हों, तो प्रैक्टिस करने के लिए <strong>Begin दबाएँ!</strong></p>
+  <p style="font-size:17px;"> जब आप तैयार हों, तो प्रैक्टिस करने के लिए <strong>शुरू दबाएँ!</strong></p>
   <p style="font-size:17px;"> प्रैक्टिस ट्रायल के लिए आपको 1 मिनट दिया जाएगा, लेकिन याद रखें कि असली टास्क के लिए आपको 3 मिनट दिए जाएंगे।</p> 
   `,
-  choices: ["Begin"],
+  choices: ["शुरू"],
   on_load: function() {
     clearInterval(timerInterval);
     resetCountdown();
@@ -129,14 +129,14 @@ var SpAMInstructions = {
   <p style="font-size:17px;"> तीन बार करेंगे, जो उन शब्दों पर आधारित होगी जो आपने संबंधित वर्बल फ्लुएंसी टास्क में टाइप किए थे। </p>
   <p style="font-size:17px;"> हर शब्द को ड्रैग करने के बाद, अगला शब्द आएगा। आप पहले से रखे गए शब्दों को फिर से व्यवस्थित कर सकते हैं।</p>
   <p style="font-size:17px;"> ध्यान दें, ट्रायल पूरा करने के लिए, <u>सभी आइटम्स</u> को "एक्टिव एरीना" (बीच वाले बड़े बॉक्स) में ले जाना ज़रूरी है। </p>
-  <p style="font-size:17px;"> जब आप व्यवस्थित कर लें, तो स्क्रीन के नीचे दिए गए छोटे Continue बटन पर क्लिक करें।</p>
+  <p style="font-size:17px;"> जब आप व्यवस्थित कर लें, तो स्क्रीन के नीचे दिए गए छोटे कंटिन्यू  बटन पर क्लिक करें।</p>
   
     <p style="font-size:5px;"> ‎</p>
 
   <p style="font-size:17px;"> चलिए अपना प्रैक्टिस राउंड जारी रखते हैं!</p>
-  <p style="font-size:17px;"> जब आप तैयार हों, तो <strong>Begin दबाएँ।</strong></p>
+  <p style="font-size:17px;"> जब आप तैयार हों, तो <strong>शुरू दबाएँ।</strong></p>
   `,
-  choices: ["Begin"],
+  choices: ["शुरू"],
       data: {
         typeoftrial: 'instructions',
         subject: subject_id
@@ -153,9 +153,9 @@ var startInstructions = {
   <p style="font-size:18x;"> उसके बाद, आपको उन टाइप किए गए शब्दों को दिए गए बॉक्स में इस आधार पर व्यवस्थित करना होगा कि वे एक-दूसरे से कितने संबंधित हैं।</p>
 
   <p style="font-size:10px;"> ‎</p>
-  <p style="font-size:18px;"> जब आप तैयार हों, तो वर्बल फ्लुएंसी टास्क शुरू करने के लिए <strong>Begin दबाएँ</strong>।</p>
+  <p style="font-size:18px;"> जब आप तैयार हों, तो वर्बल फ्लुएंसी टास्क शुरू करने के लिए <strong>शुरू दबाएँ</strong>।</p>
   `,
-  choices: ["Begin"],
+  choices: ["शुरू"],
       data: {
         typeoftrial: 'instructions',
         subject: subject_id
@@ -174,10 +174,10 @@ var betweenVFTAndSpAMInstructions = {
   <p style="font-size:16px;"> यदि शब्द समान लगते हैं, तो उन्हें पास-पास रखें; यदि वे अलग लगते हैं,</p>
   <p style="font-size:16px;"> तो उन्हें एक-दूसरे से दूर रखें।</p>
   <p style="font-size:10px;"> ‎</p>
-  <p style="font-size:18px;"> शुरू करने के लिए <strong>Begin</strong> दबाएँ।</p>
+  <p style="font-size:18px;"> शुरू करने के लिए <strong>शुरू</strong> दबाएँ।</p>
 
   `,
-  choices: ["Begin"],
+  choices: ["शुरू"],
       data: {
         typeoftrial: 'instructions',
         subject: subject_id
@@ -191,10 +191,10 @@ var afterSpAMInstructions = {
   <p style="font-size:18px;"> <strong>अब आप अगली कैटेगरी पर जाएंगे।</strong></p>
   <p style="font-size:16px;"> याद दिलाने के लिए, इस टास्क में आपको बड़े अक्षरों में दी गई कैटेगरी</p> 
   <p style="font-size:16px;"> से जुड़े जितने भी शब्द याद आएं, उन सभी को टाइप करना है।</p>
-  <p style="font-size:18px;"> शुरू करने के लिए <strong>Begin</strong> दबाएँ।</p>
+  <p style="font-size:18px;"> शुरू करने के लिए <strong>शुरू</strong> दबाएँ।</p>
 
   `,
-  choices: ["Begin"],
+  choices: ["शुरू"],
       data: {
         typeoftrial: 'instructions',
         subject: subject_id
@@ -537,7 +537,7 @@ function SpamTask(domain) {
       let html = `
         <p style="font-size:20px;">हर शब्द को नीचे दिए गए ड्रॉप बॉक्स में इस आधार पर व्यवस्थित करें कि वे एक-दूसरे से कितने संबंधित हैं।</p> 
         <p style="font-size:18px;"><strong>हर शब्द</strong> को मूव करने के बाद एक नया शब्द दिखाई देगा।</p>
-        <p style="font-size:17px;"> जब आप स्पेस व्यवस्थित कर लें, तो स्क्रीन के नीचे दिए गए छोटे Continue बटन पर क्लिक करें।</p>
+        <p style="font-size:17px;"> जब आप स्पेस व्यवस्थित कर लें, तो स्क्रीन के नीचे दिए गए छोटे कंटिन्यू  बटन पर क्लिक करें।</p>
        <div id="word-drop-area" style="
             margin: 40px auto;
             width: 80vw;
@@ -570,7 +570,7 @@ function SpamTask(domain) {
         return html;
   },
   
-  choices: ["Continue"], 
+  choices: ["कंटिन्यू "], 
   button_html: `
   <button 
     class="jspsych-btn" 
@@ -753,17 +753,19 @@ function SpamTask(domain) {
 var demographics_intro = {
         type: jsPsychInstructions,
         pages: [
-            '<br><br><br>प्रयोग अब पूरा हो चुका है! अब हम आपसे कुछ संक्षिप्त जनसांख्यिकीय प्रश्न पूछेंगे। <br><br> हालाँकि कुछ प्रश्न अनिवार्य (*) हैं, आप उन अन्य प्रश्नों को छोड़ सकते हैं जिनका उत्तर आप नहीं देना चाहते। <br><br>अपने जवाब भरने के बाद, अगले पेज पर जाने के लिए आप CONTINUE दबा सकते हैं।'
+            '<br><br><br>प्रयोग अब पूरा हो चुका है! अब हम आपसे कुछ संक्षिप्त जनसांख्यिकीय प्रश्न पूछेंगे। <br><br> हालाँकि कुछ प्रश्न अनिवार्य (*) हैं, आप उन अन्य प्रश्नों को छोड़ सकते हैं जिनका उत्तर आप नहीं देना चाहते। <br><br>अपने जवाब भरने के बाद, अगले पेज पर जाने के लिए आप कंटिन्यू दबा सकते हैं।'
         ],
         show_clickable_nav: true
     }
 
 var demographics_survey1 = {
         type: jsPsychSurveyHtmlForm,
-        preamble: "<h2><br><br><br>Demographics Questionnaire</h2>", name: 'heading', rows: 1, columns: 50,
+        preamble: "<h2><br><br><br>अनुवर्ती प्रश्न</h2>", name: 'heading', rows: 1, columns: 50,
         html: `
-        <label for="gender">आपका लिंग क्या है?</label>
-        <input type="text" id="gender" name="gender" required><br><br>
+        <label>आपका लिंग क्या है?</label><br>
+        <label><input type="radio" name="gender" value="Male" required> Male</label><br>
+        <label><input type="radio" name="gender" value="Female"> Female</label><br>
+        <label><input type="radio" name="gender" value="Others"> Others</label><br><br>
         
         <label for="age">आपकी उम्र क्या है?</label>
         <input type="number" id="age" name="age" min="0" max="120" required><br><br>
@@ -782,78 +784,177 @@ var demographics_survey1 = {
             
         }
     };
-        
+
     var demographics_survey2 = {  
-    type: jsPsychSurveyMultiSelect,
-    preamble: "<h2><br><br><br>Demographics Questionnaire</h2>", name: 'heading', rows: 1, columns: 50,
-    questions: [  
-        {
-            prompt: "Please select all the racial categories that apply to you:",
-            name: 'race',
-            options: ['American Indian/Alaskan Native', 'Asian','Black/African American', 'Native Hawaiian or Other Pacific Islander', 'White/Caucasian', 'Other'
-            ],
-            required: true,
-            is_multiple: true 
-        },
+    type: jsPsychSurveyMultiChoice,
+    preamble: "<h2><br><br><br>अनुवर्ती प्रश्न</h2>", name: 'heading', rows: 1, columns: 50,
+    questions: [
+      {
+        prompt: "आपका प्रमुख हाथ कौन सा है?",
+        name: 'dominant_hand',
+        options: ['दायाँ', 'बायाँ', 'दोनों'],
+      },
+      {
+        prompt: "कृपया बताएं कि दिन के किस समय आप सबसे अधिक सतर्क महसूस करते हैं:",
+        name: 'alert_time',
+        options: ['सुबह', 'दोपहर', 'शाम', 'कोई अंतर नहीं'],
+      },
     ],
     data: {
         typeoftrial: 'demographics',
     },
     on_finish: function(data){
-        data.race = data.response.race
-        // if length of data.race is more than 1, then replace race with "multiracial"
-        if(data.race.length > 1){
-          data.race = "multiracial"
-      }
-      else{
-        data.race = data.race[0]
-      }
+      data.dominant_hand = data.response.dominant_hand
+      data.alert_time = data.response.alert_time
     }
     };
 
     var demographics_survey3 = {  
-    type: jsPsychSurveyMultiChoice,
-    preamble: "<h2><br><br><br>Demographics Questionnaire</h2>", name: 'heading', rows: 1, columns: 50,
-    questions: [
-        {
-            prompt: "Are you of Hispanic, Latino/a/x or of Spanish origin?",
-            name: 'hispanic',
-            options: ['Yes', 'No'],
-        },
-        {
-            prompt: "आपका प्रमुख हाथ कौन सा है?",
-            name: 'dominant_hand',
-            options: ['दायाँ', 'बायाँ', 'दोनों'],
-        },
-        {
-            prompt: "कृपया बताएं कि दिन के किस समय आप सबसे अधिक सतर्क महसूस करते हैं:",
-            name: 'alert_time',
-            options: ['सुबह', 'दोपहर', 'शाम', 'कोई अंतर नहीं'],
-        },
-    ],
+    type: jsPsychSurveyHtmlForm,
+    preamble: "<h2><br><br><br>अनुवर्ती प्रश्न</h2>", name: 'heading', rows: 1, columns: 50,
+    html: `
+      <label for="state_ut">आप किस भारतीय राज्य या केंद्र शासित प्रदेश से हैं?</label><br>
+      <select id="state_ut" name="state_ut" required>
+        <option value="">--चुनें--</option>
+        <option value="Andhra Pradesh">Andhra Pradesh</option>
+        <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+        <option value="Assam">Assam</option>
+        <option value="Bihar">Bihar</option>
+        <option value="Chhattisgarh">Chhattisgarh</option>
+        <option value="Goa">Goa</option>
+        <option value="Gujarat">Gujarat</option>
+        <option value="Haryana">Haryana</option>
+        <option value="Himachal Pradesh">Himachal Pradesh</option>
+        <option value="Jharkhand">Jharkhand</option>
+        <option value="Karnataka">Karnataka</option>
+        <option value="Kerala">Kerala</option>
+        <option value="Madhya Pradesh">Madhya Pradesh</option>
+        <option value="Maharashtra">Maharashtra</option>
+        <option value="Manipur">Manipur</option>
+        <option value="Meghalaya">Meghalaya</option>
+        <option value="Mizoram">Mizoram</option>
+        <option value="Nagaland">Nagaland</option>
+        <option value="Odisha">Odisha</option>
+        <option value="Punjab">Punjab</option>
+        <option value="Rajasthan">Rajasthan</option>
+        <option value="Sikkim">Sikkim</option>
+        <option value="Tamil Nadu">Tamil Nadu</option>
+        <option value="Telangana">Telangana</option>
+        <option value="Tripura">Tripura</option>
+        <option value="Uttar Pradesh">Uttar Pradesh</option>
+        <option value="Uttarakhand">Uttarakhand</option>
+        <option value="West Bengal">West Bengal</option>
+        <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
+        <option value="Chandigarh">Chandigarh</option>
+        <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and Daman and Diu</option>
+        <option value="Delhi">Delhi</option>
+        <option value="Jammu and Kashmir">Jammu and Kashmir</option>
+        <option value="Ladakh">Ladakh</option>
+        <option value="Lakshadweep">Lakshadweep</option>
+        <option value="Puducherry">Puducherry</option>
+      </select><br><br>
+    `,
     data: {
-        typeoftrial: 'demographics',
+          typeoftrial: 'demographics',
     },
     on_finish: function(data){
-        data.hispanic = data.response.hispanic
-        data.dominant_hand = data.response.dominant_hand
-        data.alert_time = data.response.alert_time
+      data.state_ut = data.response.state_ut
     }
     };
 
 
     var demographics_survey4 = {  
-    type: jsPsychHtmlButtonResponse,
-    preamble: "<h2><br><br><br>Demographics Questionnaire</h2>", name: 'heading', rows: 1, columns: 50,
-    stimulus: "<br><br><br>Is English your first language?",
-    choices: ['Yes','No'],
+    type: jsPsychSurveyHtmlForm,
+    preamble: "<h2><br><br><br>अनुवर्ती प्रश्न</h2>", name: 'heading', rows: 1, columns: 50,
+    html: `
+      <label for="first_language">आपकी पहली भाषा क्या है?</label>
+      <input type="text" id="first_language" name="first_language" required><br><br>
+
+      <label for="language_count">आप कुल कितनी भाषाएँ जानते हैं?</label>
+      <input type="number" id="language_count" name="language_count" min="1" max="50" required><br><br>
+
+      <label>आप कौन-कौन सी भाषाएँ जानते हैं? भाषा टाइप करें और Enter दबाएँ:</label>
+      <div id="language-inputs" style="margin-top: 8px;">
+        <input type="text" id="language_entry" class="language-entry" placeholder="भाषा का नाम" autocomplete="off">
+        <input type="hidden" id="languages_buffer" name="languages_buffer" value="">
+      </div>
+      <p style="font-size: 12px; color: gray; margin-top: 6px;">प्रत्येक भाषा टाइप करके Enter दबाएँ; बॉक्स साफ़ हो जाएगा और भाषा सूची में जुड़ जाएगी।</p>
+    `,
 
     data: {
         typeoftrial: 'demographics',
     },
+    on_load: function() {
+      const entry = document.getElementById("language_entry");
+      const buffer = document.getElementById("languages_buffer");
+      const languages = [];
+
+      function syncBuffer() {
+        buffer.value = languages.join("||");
+      }
+
+      entry.addEventListener("keydown", function(event) {
+        if (event.key !== "Enter") return;
+        event.preventDefault();
+        const val = entry.value.trim();
+        if (!val) return;
+        languages.push(val);
+        syncBuffer();
+        entry.value = "";
+      });
+    },
     on_finish: function(data){
-        if(data.response == 0){data.english = "yes"}
-        else{data.english = "no"}
+        const responses = data.response || {};
+        const languages = (responses.languages_buffer || "")
+          .split("||")
+          .map((lang) => lang.trim())
+          .filter((lang) => lang !== "");
+
+        data.first_language = responses.first_language;
+        data.language_count = responses.language_count;
+        data.languages_list = languages;
+
+        window.reportedLanguages = languages;
+    }
+    };
+
+    var demographics_survey5 = {  
+    type: jsPsychSurveyHtmlForm,
+    preamble: "<h2><br><br><br>अनुवर्ती प्रश्न</h2>", name: 'heading', rows: 1, columns: 50,
+    html: function() {
+      const langs = window.reportedLanguages || [];
+      if (!Array.isArray(langs) || langs.length === 0) {
+        return "<p><br><br><br>कोई भाषा दर्ज नहीं की गई। कृपया पिछला प्रश्न पूरा करें और आगे बढ़ें।</p>";
+      }
+
+      const inputs = langs
+        .map((lang, index) => `
+          <label for="confidence_${index}">${lang} के लिए आत्मविश्वास (1-5):</label>
+          <input type="number" id="confidence_${index}" name="confidence_${index}" min="1" max="5" required><br><br>
+        `)
+        .join("");
+
+      return `
+        <p><br><br><br>कृपया आपने ऊपर सूचीबद्ध प्रत्येक भाषा के लिए 1 से 5 के बीच आत्मविश्वास स्तर दर्ज करें।</p>
+        ${inputs}
+      `;
+    },
+    data: {
+        typeoftrial: 'demographics',
+    },
+    on_finish: function(data){
+        const responses = data.response || {};
+        const langs = Array.isArray(window.reportedLanguages) ? window.reportedLanguages : [];
+        const confidence = {};
+
+        langs.forEach((lang, index) => {
+          const key = `confidence_${index}`;
+          if (responses[key] !== undefined) {
+            confidence[lang] = responses[key];
+          }
+        });
+
+        data.language_confidence = confidence;
     }
     };
 
@@ -873,7 +974,7 @@ var additional_info_question = {
 
 var follow_up_questions = {
   type: jsPsychSurveyHtmlForm,
-  preamble: "<h2><br><br><br>Demographics Questionnaire</h2>", name: 'heading', rows: 1, columns: 50,
+  preamble: "<h2><br><br><br>अनुवर्ती प्रश्न</h2>", name: 'heading', rows: 1, columns: 50,
   preamble: "<br><br><br>You indicated that English is not your first language. Please answer the following questions:<br><br>",
   html: `
     <label for="first_language_detail">What is your first language?</label>
@@ -902,7 +1003,7 @@ var follow_up_procedure = {
 
 
 var demographics = {
-    timeline: [demographics_intro, demographics_survey1, demographics_survey2, demographics_survey3, demographics_survey4, follow_up_procedure]
+  timeline: [demographics_intro, demographics_survey1, demographics_survey2, demographics_survey3, demographics_survey4, demographics_survey5, follow_up_procedure]
 };
 
 var save_data = {
