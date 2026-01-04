@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Language experiment</title>
+    <script src="https://unpkg.com/jspsych@7.1.2"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-html-button-response@1.1.0"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-call-function@1.1.0"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-survey-text@1.1.1"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.1"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-instructions@1.1.0"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-survey-html-form@1.0.0"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-survey-multi-select@1.1.1"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-survey-multi-choice@1.1.1"></script>
+
+    <link href="https://unpkg.com/jspsych@7.1.2/css/jspsych.css" rel="stylesheet" type="text/css" />
+    <link href="timerstyle.css" rel="stylesheet" type="text/css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src = "timer.js"></script> 
+
+  </head>
+  <body>
+    <div id="app"></div>
+    <div id="jspsych-target"></div>
+    
+    <script>
+
+// should be window.jsPsych (instead of var) if running in cognition.run
+var jsPsych = initJsPsych({
+  display_element: 'jspsych-target',
+      on_finish: function() {
+        jsPsych.data.displayData();
+      },
+      on_trial_start: function(trial) {
+        jsPsych.data.addProperties({subject: subject_id});
+      }
+    });
+
+//enables sequence of events in experiment 
+var timeline = [];
+  
+//creates random subject number 
+var subject_id = Math.floor(Math.random()*100000);
+
+//formats opening instruction page and tells participant about experiment
+var maininstructions = {
+  type: jsPsychHtmlButtonResponse,
+  stimulus: `
+  <p style="font-size:20px;"> इस प्रयोग में भाग लेने के लिए धन्यवाद!</p>
+  <p style="font-size:20px;"> ‎</p>
+  <p style="font-size:22px;"> <strong>इस प्रयोग में दो चरण हैं:</strong></p>
+  <p style="font-size:18px;"> <u>प्रथम चरण में,</u>, आपको एक कैटेगरी का नाम दिखाया जाएगा।
+  <p style="font-size:18px;"> आपको निर्धारित समय सीमा के भीतर उस कैटेगरी से संबंधित जितने संभव हो सकें, उतने शब्द टाइप करने होंगे। </p>
+  <p style="font-size:18px;"> <u>दूसरे चरण में</u>, आप पहले टाइप किए गए हर शब्द को ऐसे संगठित करे </p>
+  <p style="font-size:18px;"> जिससे समान अर्थ वाले शब्द एक-दुसरे के ज्यादा करीब हो।</p>
+  <p style="font-size:18px;"> इस एक्सपेरिमेंट में सिर्फ़ 3 "ट्रायल" होंगे, इसलिए कृपया जितना हो सके उतना सटीकता बनाए रखें।
+  <p style="font-size:18px;"> टाइप करते समय अथवा वस्तुओं को संगठित करते समय,शीघ्रता की आवश्यकता नहीं है,सटीकता सबसे महत्वपूर्ण है।</p>
+  <p style="font-size:20px;"> ‎</p>
+  <p style="font-size:18px;"> शुरू करने से पहले, हम आपको एक्सपेरिमेंट लेआउट से परिचित कराना चाहते हैं। हम आपको इसके बारे में बताएंगे।</p>
+  <p style="font-size:18px;"> मुख्य कार्य आरंभ करने से पहले, आपको एक अभ्यास सत्र दिया जाएगा, जिसमें विस्तृत निर्देश दिये गये है|</p>
+
+
+  <p style="font-size:18px;"> जब आप शुरू करने के लिए तैयार हों, <strong>"कंटिन्यू  " दबाएँ।</strong></p>
+
+  `,
+  choices: ["कंटिन्यू "],
+  on_load: function() {
+    clearInterval(timerInterval);
+    resetCountdown();
+    jsPsych.pluginAPI.clearAllTimeouts();
+
+  },
+      data: {
+        typeoftrial: 'instructions',
+        subject: subject_id
+    }
+};    
+
+//instructs participants on VFT task with video example
+var VFTInstructions = {
+  type: jsPsychHtmlButtonResponse,
+  stimulus: `
+  <p style="font-size:22px;"><strong>आप अभी एक वर्बल फ्लुएंसी टास्क करने वाले हैं।</strong></p>
+  <p style="font-size:17px;"> इस टास्क में आपको एक कैटेगरी का नाम दिखाया जाएगा (जैसे, फर्नीचर)।</p>
+  <p style="font-size:17px;"> आपका काम है 3 मिनट में उस कैटेगरी से जुड़ी जितनी ज़्यादा चीज़ें आप सोच सकते हैं, उन्हें टाइप करना।</p>
+  <p style="font-size:17px;"> आपको यह काम तीन अलग-अलग डोमेन पर तीन बार करना होगा।</p> 
+  
+
+  <video width = "600" height = "300" autoplay muted loop style = "margin-top: 10px;">
+    <source src = "VFTTutorial.mp4" type = "video/mp4">
+  </video>
+
+  <p style="font-size:17px;"> हर शब्द टाइप करने के बाद, अगला शब्द टाइप करने के लिए <strong>ENTER</strong> दबाएँ।</p>
+  <p style="font-size:17px;"> जब टाइमर खत्म हो जाएगा, तो आप अपने आप अगले टास्क पर चले जाएंगे।</p>
+
+  <p style="font-size:17px;"> जब आप तैयार हों, तो प्रैक्टिस करने के लिए <strong>शुरू दबाएँ!</strong></p>
+  <p style="font-size:17px;"> प्रैक्टिस ट्रायल के लिए आपको 1 मिनट दिया जाएगा, लेकिन याद रखें कि असली टास्क के लिए आपको 3 मिनट दिए जाएंगे।</p> 
+  `,
+  choices: ["शुरू"],
+  on_load: function() {
+    clearInterval(timerInterval);
+    resetCountdown();
+    jsPsych.pluginAPI.clearAllTimeouts();
+
+  },
+      data: {
+        typeoftrial: 'instructions',
+        subject: subject_id
+    }
+};    
+
+//instructs participants on SpAM task with video example
+var SpAMInstructions = {
+  type: jsPsychHtmlButtonResponse,
+  stimulus: `
+  <p style="font-size:22px;"> <strong>अब, आप एक स्पेशियल अरेंजमेंट टास्क शुरू करेंगे।</strong></p>
+  <p style="font-size:17px;"> इस टास्क में, आपको उन शब्दों का सेट दिखाया जाएगा जो आपने पिछले वर्बल फ्लुएंसी टास्क में टाइप किए थे।</p>
+  <p style="font-size:17px;"> हमें यह जानना है कि आपके अनुसार ये शब्द एक-दूसरे से कितने मिलते-जुलते हैं। आपका काम है हर शब्द को इस तरह मूव करना</p>
+  <p style="font-size:17px;"> कि समान शब्द एक-दूसरे के करीब आ जाएं। यानी, आपको उन्हें स्पेस में इस तरह रखना चाहिए</p>
+  <p style="font-size:17px;"> कि हर जोड़ी के बीच की दूरी यह दर्शाए कि वे एक-दूसरे से कितने समान हैं।</p>
+  <p style="font-size:17px;"> (स्पेस में पास होने का मतलब है ज़्यादा समानता, और दूर होने का मतलब है ज़्यादा असमानता)</p>
+
+  <video width = "600" height = "400" autoplay muted loop style = "margin-top: 10px;">
+    <source src = "SpAMTutorial.mp4" type = "video/mp4">
+  </video>
+
+<p style="font-size:17px;"> शब्द एक बॉक्स के ऊपरी बाएँ कोने में एक-एक करके दिखाई देंगे। आप बस उन्हें</p>
+  <p style="font-size:17px;"> क्लिक और ड्रैग करके हिला सकते हैं। यदि शब्द समान लगते हैं, तो उन्हें पास-पास रखें।</p>
+  <p style="font-size:17px;"> यदि वे अलग लगते हैं, तो उन्हें एक-दूसरे से दूर रखें। आप यह प्रक्रिया तीन अलग-अलग डोमेन पर</p> 
+  <p style="font-size:17px;"> तीन बार करेंगे, जो उन शब्दों पर आधारित होगी जो आपने संबंधित वर्बल फ्लुएंसी टास्क में टाइप किए थे। </p>
+  <p style="font-size:17px;"> हर शब्द को ड्रैग करने के बाद, अगला शब्द आएगा। आप पहले से रखे गए शब्दों को फिर से व्यवस्थित कर सकते हैं।</p>
+  <p style="font-size:17px;"> ध्यान दें, ट्रायल पूरा करने के लिए, <u>सभी आइटम्स</u> को "एक्टिव एरीना" (बीच वाले बड़े बॉक्स) में ले जाना ज़रूरी है। </p>
+  <p style="font-size:17px;"> जब आप व्यवस्थित कर लें, तो स्क्रीन के नीचे दिए गए छोटे कंटिन्यू  बटन पर क्लिक करें।</p>
+  
+    <p style="font-size:5px;"> ‎</p>
+
+  <p style="font-size:17px;"> चलिए अपना प्रैक्टिस राउंड जारी रखते हैं!</p>
+  <p style="font-size:17px;"> जब आप तैयार हों, तो <strong>शुरू दबाएँ।</strong></p>
+  `,
+  choices: ["शुरू"],
+      data: {
+        typeoftrial: 'instructions',
+        subject: subject_id
+    }
+};    
+
+//instructs participant after they complete the practice round
+var startInstructions = {
+  type: jsPsychHtmlButtonResponse,
+  stimulus: `
+  <p style="font-size:20px;">आपने प्रैक्टिस राउंड पूरा कर लिया है!</p>
+  <p style="font-size:18x;"> अब आप असली टास्क शुरू करेंगे, जिसमें अलग-अलग कैटेगरी के तीन राउंड होंगे।</p>
+  <p style="font-size:18x;"> फिर से, आपका पहला काम समय सीमा के भीतर दी गई कैटेगरी से जुड़े ज़्यादा से ज़्यादा शब्द टाइप करना है।</p>
+  <p style="font-size:18x;"> उसके बाद, आपको उन टाइप किए गए शब्दों को दिए गए बॉक्स में इस आधार पर व्यवस्थित करना होगा कि वे एक-दूसरे से कितने संबंधित हैं।</p>
+
+  <p style="font-size:10px;"> ‎</p>
+  <p style="font-size:18px;"> जब आप तैयार हों, तो वर्बल फ्लुएंसी टास्क शुरू करने के लिए <strong>शुरू दबाएँ</strong>।</p>
+  `,
+  choices: ["शुरू"],
+      data: {
+        typeoftrial: 'instructions',
+        subject: subject_id
+    }
+};    
+
+//provides reminder of instructions between VFT task and SpAM
+var betweenVFTAndSpAMInstructions = {
+  type: jsPsychHtmlButtonResponse,
+  stimulus: `
+<p style="font-size:20px;"> <strong>आप स्पेशियल अरेंजमेंट टास्क की ओर बढ़ रहे हैं।</strong></p>
+  <p style="font-size:16px;"> याद दिलाने के लिए, इस टास्क में आपको शब्दों का एक सेट दिखाया जाएगा।</p>
+  <p style="font-size:16px;"> हमें यह जानना है कि आपको ये शब्द एक-दूसरे से कितने समान लगते हैं।</p>
+  <p style="font-size:16px;"> समानता दिखाने के लिए, आपको हर शब्द को इस तरह मूव करना होगा</p> 
+  <p style="font-size:16px;"> कि समान शब्द एक-दूसरे के करीब आ जाएं।</p>
+  <p style="font-size:16px;"> यदि शब्द समान लगते हैं, तो उन्हें पास-पास रखें; यदि वे अलग लगते हैं,</p>
+  <p style="font-size:16px;"> तो उन्हें एक-दूसरे से दूर रखें।</p>
+  <p style="font-size:10px;"> ‎</p>
+  <p style="font-size:18px;"> शुरू करने के लिए <strong>शुरू</strong> दबाएँ।</p>
+
+  `,
+  choices: ["शुरू"],
+      data: {
+        typeoftrial: 'instructions',
+        subject: subject_id
+    }
+};    
+
+//provides reminder of instructions for next VFT category
+var afterSpAMInstructions = {
+  type: jsPsychHtmlButtonResponse,
+  stimulus: `
+  <p style="font-size:18px;"> <strong>अब आप अगली कैटेगरी पर जाएंगे।</strong></p>
+  <p style="font-size:16px;"> याद दिलाने के लिए, इस टास्क में आपको बड़े अक्षरों में दी गई कैटेगरी</p> 
+  <p style="font-size:16px;"> से जुड़े जितने भी शब्द याद आएं, उन सभी को टाइप करना है।</p>
+  <p style="font-size:18px;"> शुरू करने के लिए <strong>शुरू</strong> दबाएँ।</p>
+
+  `,
+  choices: ["शुरू"],
+      data: {
+        typeoftrial: 'instructions',
+        subject: subject_id
+    }
+};    
+
+window.responseData = {};
+
+// Google Input Tools API transliteration function
+async function transliterateToHindi(text) {
+  if (!text || text.trim() === '') return [];
+  
+  try {
+    const url = `https://inputtools.google.com/request?text=${encodeURIComponent(text)}&itc=hi-t-i0-und&num=5&cp=0&cs=1&ie=utf-8&oe=utf-8`;
+    const response = await fetch(url);
+    const data = await response.json();
+    
+    if (data[0] === 'SUCCESS' && data[1] && data[1][0] && data[1][0][1] && data[1][0][1].length > 0) {
+      return data[1][0][1].slice(0, 5); // Return top 5 suggestions
+    }
+    return [];
+  } catch (error) {
+    console.error('Transliteration error:', error);
+    return [];
+  }
+}
+
+// Create and manage suggestion dropdown
+function createSuggestionDropdown(inputElement) {
+  let dropdown = document.getElementById('transliteration-dropdown');
+  if (!dropdown) {
+    dropdown = document.createElement('div');
+    dropdown.id = 'transliteration-dropdown';
+    dropdown.style.cssText = `
+      position: absolute;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      max-height: 200px;
+      overflow-y: auto;
+      z-index: 10000;
+      display: none;
+    `;
+    document.body.appendChild(dropdown);
+  }
+  return dropdown;
+}
+
+function showSuggestions(inputElement, suggestions) {
+  const dropdown = createSuggestionDropdown(inputElement);
+  dropdown.innerHTML = '';
+  
+  if (suggestions.length === 0) {
+    dropdown.style.display = 'none';
+    return;
+  }
+  
+  suggestions.forEach((suggestion, index) => {
+    const item = document.createElement('div');
+    item.textContent = suggestion;
+    item.style.cssText = `
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 16px;
+    `;
+    item.dataset.index = index;
+    
+    item.addEventListener('mouseenter', function() {
+      dropdown.querySelectorAll('div').forEach(el => el.style.backgroundColor = 'white');
+      this.style.backgroundColor = '#e3f2fd';
+    });
+    
+    item.addEventListener('click', function() {
+      inputElement.value = suggestion;
+      dropdown.style.display = 'none';
+      inputElement.focus();
+    });
+    
+    dropdown.appendChild(item);
+  });
+  
+  // Position dropdown
+  const rect = inputElement.getBoundingClientRect();
+  dropdown.style.left = rect.left + 'px';
+  dropdown.style.top = (rect.bottom + 2) + 'px';
+  dropdown.style.width = rect.width + 'px';
+  dropdown.style.display = 'block';
+  
+  // Highlight first item
+  if (dropdown.firstChild) {
+    dropdown.firstChild.style.backgroundColor = '#e3f2fd';
+  }
+}
+
+function hideSuggestions() {
+  const dropdown = document.getElementById('transliteration-dropdown');
+  if (dropdown) dropdown.style.display = 'none';
+}
+
+function setupTransliteration(inputElement, domain) {
+  let transliterateTimeout;
+  let currentSuggestions = [];
+  let selectedIndex = 0;
+  
+  inputElement.addEventListener('input', function(e) {
+    clearTimeout(transliterateTimeout);
+    const inputValue = this.value;
+    
+    if (!inputValue.trim()) {
+      hideSuggestions();
+      return;
+    }
+    
+    transliterateTimeout = setTimeout(async () => {
+      const suggestions = await transliterateToHindi(inputValue);
+      currentSuggestions = suggestions;
+      selectedIndex = 0;
+      showSuggestions(inputElement, suggestions);
+    }, 20);
+  });
+  
+  inputElement.addEventListener('keydown', function(e) {
+    const dropdown = document.getElementById('transliteration-dropdown');
+    if (!dropdown || dropdown.style.display === 'none') return;
+    
+    const items = dropdown.querySelectorAll('div');
+    if (items.length === 0) return;
+    
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      selectedIndex = (selectedIndex + 1) % items.length;
+      items.forEach((item, idx) => {
+        item.style.backgroundColor = idx === selectedIndex ? '#e3f2fd' : 'white';
+      });
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      selectedIndex = (selectedIndex - 1 + items.length) % items.length;
+      items.forEach((item, idx) => {
+        item.style.backgroundColor = idx === selectedIndex ? '#e3f2fd' : 'white';
+      });
+    } else if (e.key === 'Enter' && currentSuggestions.length > 0) {
+      e.preventDefault();
+      e.stopPropagation();
+      this.value = currentSuggestions[selectedIndex];
+      hideSuggestions();
+      // Trigger the actual Enter handler
+      const enterEvent = new KeyboardEvent('keydown', {
+        key: 'Enter',
+        code: 'Enter',
+        keyCode: 13,
+        which: 13,
+        bubbles: true
+      });
+      setTimeout(() => this.dispatchEvent(enterEvent), 10);
+    } else if (e.key === 'Escape') {
+      hideSuggestions();
+    }
+  });
+  
+  inputElement.addEventListener('blur', function() {
+    setTimeout(() => hideSuggestions(), 20);
+  });
+}
+
+//tracks responses and reaction time, adding each to a seperate array
+function createResponseHandler(domain) {
+  return function(event) {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        const currentInput = document.activeElement;
+
+      if (
+        currentInput.classList.contains(`${domain}-response`) && 
+        currentInput.value.trim() !==""
+      ) {
+        const timeElapsed = Number((performance.now()- responseData[domain].startTime).toFixed(2));
+        
+        responseData[domain].responses.push(currentInput.value.trim());
+        responseData[domain].times.push(timeElapsed)
+
+        currentInput.disabled = true;
+        currentInput.classList.remove("active");
+
+        const newInput = document.createElement("input");
+        newInput.type = "text";
+        newInput.className = `${domain}-response active`;
+        
+        document.getElementById("responses").appendChild(newInput);
+        setupTransliteration(newInput, domain);
+        newInput.focus();
+      }
+    }
+  };
+}
+
+//formats VFT and maps tag and response time to each item input 
+function VFTTask(domain, prompt, time = 10000) {
+  const className = `${domain}-response`;
+  const responseHandler = createResponseHandler(domain);
+  
+  return {
+  type: jsPsychHtmlKeyboardResponse,
+  data: {
+    task: "VFT",
+    domain: domain,
+    subject: subject_id
+  },
+  
+  stimulus:`
+    <div id = "timer-box"></div>
+    <div id = "response-input-box">
+      <p style = "font-size:30px;">${prompt}</p>
+      <div id = "responses">
+        <input type = "text" class = "${className} active" autofocus />
+      </div>
+      <p id = "below-input-text" style = "font-size: 14px; margin-top: 10px; color: gray; text-align: left;"> हर शब्द के बाद <strong>enter</strong> दबाएँ!</p>
+    </div>
+    <style>
+      #responses {
+      position: relative;
+      width: 300px;
+      height: 40px; 
+      }
+
+      .${className} {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        font-size: 20px;
+        padding: 5px;
+        box-sizing: border-box;
+        opacity: 0.5;
+      } 
+
+      .${className}.active {
+      opacity: 1;
+      z-index: 999;
+      }
+    </style>
+    `,
+
+  choices: [],
+  trial_duration: time, 
+  response_ends_trial: false,
+
+  on_load: function () {
+    clearInterval(timerInterval);
+    resetCountdown();
+    countDown(time);
+    
+    responseData[domain]= {
+      responses: [],
+      times: [],
+      interitem_intervals: [],
+      startTime: performance.now()
+    };
+
+    document.addEventListener ("keydown", responseHandler);
+    
+    const initialInput = document.querySelector(`.${className}.active`);
+    if (initialInput) {
+      setupTransliteration(initialInput, domain);
+      initialInput.focus();
+    }
+  },
+
+  on_finish: function(data) {
+    document.removeEventListener("keydown", responseHandler);
+   
+    const responses = responseData[domain].responses;
+
+    function responseTags(responses) {
+      return responses.map((word, index) => ({
+        response: word,
+        tag: index + 1
+      }))
+    }
+
+    const taggedResponses = responseTags(responses);
+    const times = responseData[domain].times;
+
+    const firstResponseThenIntervals = times.length > 0
+      ? [times[0], ...times.slice(1).map((time, i) => time - times[i])]
+      : [];
+
+    const roundedResponseIntervals = firstResponseThenIntervals.map(t => Number(t.toFixed(2)));
+
+      
+      data.tagged_responses = JSON.stringify(taggedResponses);
+      data.response_times = JSON.stringify(roundedResponseIntervals)
+  
+    
+    clearInterval(timerInterval);
+    }
+  };  
+}
+
+timeline.push({
+  type: jsPsychCallFunction,
+  func: () => {
+    console.log("All Data:", jsPsych.data.get().values());
+  }
+});
+
+//handles case where no words are input 
+function VFTRedo(domain, prompt, time = 10000) {
+  const VFTTrial = VFTTask(domain, prompt, time);
+  
+  return {
+    timeline: [VFTTrial],
+    loop_function: function() {
+      const trialData = jsPsych.data.get().filter({
+        task: "VFT",
+        domain: domain
+      }).last(1).values()[0];
+      let responses = [];
+
+      try {
+        responses = JSON.parse(trialData?.tagged_responses || "[]");
+      } catch (e) {
+        console.error("Error parsing tagged_responses:", e);
+    }
+
+      if (responses.length === 0) {
+        alert("You did not input any responses. Please try again.");
+        return true;
+      }
+      return false;
+    }
+  };
+}
+
+//creates SpAM task by gathering VFT responses and tracking item movement/coordinates
+function SpamTask(domain) {
+  return {
+    type: jsPsychHtmlButtonResponse,
+    stimulus: function() {
+      let html = `
+        <p style="font-size:20px;">हर शब्द को नीचे दिए गए ड्रॉप बॉक्स में इस आधार पर व्यवस्थित करें कि वे एक-दूसरे से कितने संबंधित हैं।</p> 
+        <p style="font-size:18px;"><strong>हर शब्द</strong> को मूव करने के बाद एक नया शब्द दिखाई देगा।</p>
+        <p style="font-size:17px;"> जब आप स्पेस व्यवस्थित कर लें, तो स्क्रीन के नीचे दिए गए छोटे कंटिन्यू  बटन पर क्लिक करें।</p>
+       <div id="word-drop-area" style="
+            margin: 40px auto;
+            width: 80vw;
+            max-width: 1400px;
+            height: 55vh;
+            min-height: 500px;
+            max-height: 750px;
+            border: 2px solid #aaa;
+            padding: 20px;
+            position: relative;
+          "></div>
+
+
+          <p style="font-size:14px; color: gray;">याद रखें, ज़रूरत पड़ने पर पहले रखे गए शब्दों को फिर से व्यवस्थित किया जा सकता है!</p>
+          <style>       
+            .draggable {
+              display: inline-block;
+              background: #eef;
+              padding: 4px 8px;
+              border: 1px solid #aaa;
+              border-radius: 4px;
+              cursor: grab;
+              font-size: 14px;
+              line-height: 1.2;
+              margin-bottom: 4px;
+            }
+
+        </style>    
+      `;
+        return html;
+  },
+  
+  choices: ["कंटिन्यू "], 
+  button_html: `
+  <button 
+    class="jspsych-btn" 
+    id="continue-button" 
+    style="
+      display: none;
+      margin-top: 20px;
+      background-color: #2e9f5e;
+      color: white;
+      font-size: 18px;
+      font-weight: 600;
+      padding: 12px 28px;
+      border: none;
+      border-radius: 6px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      cursor: pointer;
+    ">
+    %choice%
+  </button>
+`,
+  data: {
+    task: "SpAM",
+    domain: domain,
+    subject: subject_id
+  },
+  
+  on_load: function() {
+    const VFTResponses = jsPsych.data.get().filter({ task: "VFT", domain: domain }).last(1).values()[0];
+    const domainWords = JSON.parse(VFTResponses.tagged_responses || "[]");
+    const WordDropArea = document.getElementById("word-drop-area");
+    let currentIndex = 0;
+    window.WordsDropped = [];
+
+    //allows dragging and tracks mouse press onto a word (or rectangle the word is in)
+    function Draggable(element, onFirstMove) {
+      let offsetX, offsetY;
+      let currentlyDragging = false;
+      let hasMoved = false;
+    
+      element.addEventListener("mousedown", (event) => {
+        currentlyDragging = true;
+        const rectangle = element.getBoundingClientRect();
+        offsetX = event.clientX - rectangle.left;
+        offsetY = event.clientY - rectangle.top;
+        element.style.cursor = "grabbing";
+
+        document.addEventListener("mousemove", OnMouseMove);
+        document.addEventListener("mouseup", OnMouseUp);
+
+        event.preventDefault();
+      });
+
+      //tracks mouse movement of the rectangle the word is in and calculates where it moves
+      function OnMouseMove (event) {
+        if (!currentlyDragging) return;
+
+        const dropRectangle = WordDropArea.getBoundingClientRect();
+        let left = event.clientX - dropRectangle.left - offsetX;
+        let top = event.clientY - dropRectangle.top - offsetY;
+
+        left = Math.max(0, Math.min(left, dropRectangle.width - element.offsetWidth));
+        top = Math.max(0, Math.min(top, dropRectangle.height - element.offsetHeight));
+
+        element.style.left = left + "px"
+        element.style.top = top + "px"
+    
+        if (!hasMoved) {
+          hasMoved = true
+          if (typeof onFirstMove === "function") {
+            onFirstMove();
+          }
+        }
+      }
+      
+      //tracks when mouse is no longer pressing on word box and records words positions
+      function OnMouseUp () {
+        if (currentlyDragging) {
+          currentlyDragging = false;
+          element.style.cursor = "grab";
+          document.removeEventListener("mousemove", OnMouseMove)
+          document.removeEventListener("mouseup", OnMouseUp)
+
+          // window.WordsDropped.push({
+          //   word: element.textContent,
+          //   id: element.id,
+          //   left: element.style.left,
+          //   top: element.style.top
+          // });
+
+          const dropRect = WordDropArea.getBoundingClientRect();
+          const elemRect = element.getBoundingClientRect();
+
+          // position of element *within drop area*
+          const x_px = elemRect.left - dropRect.left;
+          const y_px = elemRect.top - dropRect.top;
+
+          // normalized coordinates (0–1)
+          const x_norm = x_px / (dropRect.width - elemRect.width);
+          const y_norm = y_px / (dropRect.height - elemRect.height);
+
+          window.WordsDropped.push({
+            word: element.textContent,
+            id: element.id,
+
+            // raw pixel values (optional, for debugging)
+            x_px: x_px,
+            y_px: y_px,
+
+            // normalized coordinates (USE THESE FOR ANALYSIS)
+            x_norm: x_norm,
+            y_norm: y_norm,
+
+            // canvas size at time of drop (important metadata)
+            canvas_width: dropRect.width,
+            canvas_height: dropRect.height
+          });
+
+          
+          if (window.WordsDropped.length === domainWords.length) {
+            const button = document.getElementById("continue-button");
+            if (button) button.style.display = "inline-block";
+          }
+
+        }
+      }
+    }
+      //handles the display of the next word by establishing placement and calling next index of animal VFT responses
+      function NextWord() {
+      if (currentIndex >= domainWords.length) return;
+
+      const words = domainWords[currentIndex];
+      const wordDiv = document.createElement("div");
+      wordDiv.textContent = words.response;
+      wordDiv.className = "draggable";
+      wordDiv.id = `word-${words.tag}`;
+      wordDiv.style.position = "absolute";
+      wordDiv.style.left = "20px";
+      wordDiv.style.top = "20px"
+      
+      WordDropArea.appendChild(wordDiv);
+      Draggable(wordDiv, () => {
+        currentIndex ++; 
+        setTimeout(() => {
+          NextWord(); 
+        }, 2000); //2 second delay before next box appears
+      });
+    }
+
+    NextWord();
+  },  
+
+  on_finish: function (data) {
+      data.droppedwords = window.WordsDropped || [];
+      data.viewport_width = window.innerWidth;
+      data.viewport_height = window.innerHeight;
+      data.device_pixel_ratio = window.devicePixelRatio;
+
+    }
+  };
+}
+
+
+  var endexperiment = {
+    //on_load: resetCountdown,
+      type: jsPsychHtmlButtonResponse,
+      stimulus: `
+      <p>आपने प्रयोग पूरा कर लिया है। भाग लेने के लिए धन्यवाद! </p>
+      <p> डीब्रीफिंग फॉर्म एक्सेस करने और हमारे शोध के बारे में अधिक जानने के लिए कृपया <a href="https://drive.google.com/file/d/1yD8wzNc2l6z4PzHAHSpVsnpay0790VCZ/view" target="_blank" rel="noopener noreferrer">यहाँ</a> क्लिक करें।</p>
+      <p> प्रयोग समाप्त करने और अपना डेटा सेव करने के लिए कृपया नीचे दिए गए बटन पर क्लिक करें।</p>
+      <p> महत्वपूर्ण: कृपया नीचे दिए गए बटन पर क्लिक किए बिना इस पेज को न छोड़ें।</p>
+        `,
+      choices: ['Finish and Save Data'],
+      button_html: '<button class="jspsych-btn">%choice%</button>',
+      data: {
+        typeoftrial: "end"
+      }
+  };
+
+  // demographics
+var demographics_intro = {
+        type: jsPsychInstructions,
+        pages: [
+            '<br><br><br>प्रयोग अब पूरा हो चुका है! अब हम आपसे कुछ संक्षिप्त जनसांख्यिकीय प्रश्न पूछेंगे। <br><br> हालाँकि कुछ प्रश्न अनिवार्य (*) हैं, आप उन अन्य प्रश्नों को छोड़ सकते हैं जिनका उत्तर आप नहीं देना चाहते। <br><br>अपने जवाब भरने के बाद, अगले पेज पर जाने के लिए आप कंटिन्यू दबा सकते हैं।'
+        ],
+        show_clickable_nav: true
+    }
+
+var demographics_survey1 = {
+        type: jsPsychSurveyHtmlForm,
+        preamble: "<h2><br><br><br>अनुवर्ती प्रश्न</h2>", name: 'heading', rows: 1, columns: 50,
+        html: `
+        <label>आपका लिंग क्या है?</label><br>
+        <label><input type="radio" name="gender" value="Male" required> Male</label><br>
+        <label><input type="radio" name="gender" value="Female"> Female</label><br>
+        <label><input type="radio" name="gender" value="Others"> Others</label><br><br>
+        
+        <label for="age">आपकी उम्र क्या है?</label>
+        <input type="number" id="age" name="age" min="0" max="120" required><br><br>
+
+        <label for="education">आपने कितने वर्षों की औपचारिक शिक्षा प्राप्त की है? (हाई स्कूल पास करने को 12 वर्ष मानें)</label>
+        <input type="number" id="education" name="education" min="0" max="120" required><br><br>
+    `,
+        data: {
+            typeoftrial: 'demographics',
+        },
+        on_finish: function(data){
+
+            data.age = data.response.age
+            data.gender = data.response.gender
+            data.education = data.response.education
+            
+        }
+    };
+
+    var demographics_survey2 = {  
+    type: jsPsychSurveyMultiChoice,
+    preamble: "<h2><br><br><br>अनुवर्ती प्रश्न</h2>", name: 'heading', rows: 1, columns: 50,
+    questions: [
+      {
+        prompt: "आपका प्रमुख हाथ कौन सा है?",
+        name: 'dominant_hand',
+        options: ['दायाँ', 'बायाँ', 'दोनों'],
+      },
+      {
+        prompt: "कृपया बताएं कि दिन के किस समय आप सबसे अधिक सतर्क महसूस करते हैं:",
+        name: 'alert_time',
+        options: ['सुबह', 'दोपहर', 'शाम', 'कोई अंतर नहीं'],
+      },
+    ],
+    data: {
+        typeoftrial: 'demographics',
+    },
+    on_finish: function(data){
+      data.dominant_hand = data.response.dominant_hand
+      data.alert_time = data.response.alert_time
+    }
+    };
+
+    var demographics_survey3 = {  
+    type: jsPsychSurveyHtmlForm,
+    preamble: "<h2><br><br><br>अनुवर्ती प्रश्न</h2>", name: 'heading', rows: 1, columns: 50,
+    html: `
+      <label for="state_ut">आप किस भारतीय राज्य या केंद्र शासित प्रदेश से हैं?</label><br>
+      <select id="state_ut" name="state_ut" required>
+        <option value="">--चुनें--</option>
+        <option value="Andhra Pradesh">Andhra Pradesh</option>
+        <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+        <option value="Assam">Assam</option>
+        <option value="Bihar">Bihar</option>
+        <option value="Chhattisgarh">Chhattisgarh</option>
+        <option value="Goa">Goa</option>
+        <option value="Gujarat">Gujarat</option>
+        <option value="Haryana">Haryana</option>
+        <option value="Himachal Pradesh">Himachal Pradesh</option>
+        <option value="Jharkhand">Jharkhand</option>
+        <option value="Karnataka">Karnataka</option>
+        <option value="Kerala">Kerala</option>
+        <option value="Madhya Pradesh">Madhya Pradesh</option>
+        <option value="Maharashtra">Maharashtra</option>
+        <option value="Manipur">Manipur</option>
+        <option value="Meghalaya">Meghalaya</option>
+        <option value="Mizoram">Mizoram</option>
+        <option value="Nagaland">Nagaland</option>
+        <option value="Odisha">Odisha</option>
+        <option value="Punjab">Punjab</option>
+        <option value="Rajasthan">Rajasthan</option>
+        <option value="Sikkim">Sikkim</option>
+        <option value="Tamil Nadu">Tamil Nadu</option>
+        <option value="Telangana">Telangana</option>
+        <option value="Tripura">Tripura</option>
+        <option value="Uttar Pradesh">Uttar Pradesh</option>
+        <option value="Uttarakhand">Uttarakhand</option>
+        <option value="West Bengal">West Bengal</option>
+        <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
+        <option value="Chandigarh">Chandigarh</option>
+        <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and Daman and Diu</option>
+        <option value="Delhi">Delhi</option>
+        <option value="Jammu and Kashmir">Jammu and Kashmir</option>
+        <option value="Ladakh">Ladakh</option>
+        <option value="Lakshadweep">Lakshadweep</option>
+        <option value="Puducherry">Puducherry</option>
+      </select><br><br>
+    `,
+    data: {
+          typeoftrial: 'demographics',
+    },
+    on_finish: function(data){
+      data.state_ut = data.response.state_ut
+    }
+    };
+
+
+    var demographics_survey4 = {  
+    type: jsPsychSurveyHtmlForm,
+    preamble: "<h2><br><br><br>अनुवर्ती प्रश्न</h2>", name: 'heading', rows: 1, columns: 50,
+    html: `
+      <label for="first_language">आपकी पहली भाषा क्या है?</label>
+      <input type="text" id="first_language" name="first_language" required><br><br>
+
+      <label for="language_count">आप कुल कितनी भाषाएँ जानते हैं?</label>
+      <input type="number" id="language_count" name="language_count" min="1" max="50" required><br><br>
+
+      <label>आप कौन-कौन सी भाषाएँ जानते हैं? भाषा टाइप करें और Enter दबाएँ:</label>
+      <div id="language-inputs" style="margin-top: 8px;">
+        <input type="text" id="language_entry" class="language-entry" placeholder="भाषा का नाम" autocomplete="off">
+        <input type="hidden" id="languages_buffer" name="languages_buffer" value="">
+      </div>
+      <p style="font-size: 12px; color: gray; margin-top: 6px;">प्रत्येक भाषा टाइप करके Enter दबाएँ; बॉक्स साफ़ हो जाएगा और भाषा सूची में जुड़ जाएगी।</p>
+    `,
+
+    data: {
+        typeoftrial: 'demographics',
+    },
+    on_load: function() {
+      const entry = document.getElementById("language_entry");
+      const buffer = document.getElementById("languages_buffer");
+      const languages = [];
+
+      function syncBuffer() {
+        buffer.value = languages.join("||");
+      }
+
+      entry.addEventListener("keydown", function(event) {
+        if (event.key !== "Enter") return;
+        event.preventDefault();
+        const val = entry.value.trim();
+        if (!val) return;
+        languages.push(val);
+        syncBuffer();
+        entry.value = "";
+      });
+    },
+    on_finish: function(data){
+        const responses = data.response || {};
+        const languages = (responses.languages_buffer || "")
+          .split("||")
+          .map((lang) => lang.trim())
+          .filter((lang) => lang !== "");
+
+        data.first_language = responses.first_language;
+        data.language_count = responses.language_count;
+        data.languages_list = languages;
+
+        window.reportedLanguages = languages;
+    }
+    };
+
+    var demographics_survey5 = {  
+    type: jsPsychSurveyHtmlForm,
+    preamble: "<h2><br><br><br>अनुवर्ती प्रश्न</h2>", name: 'heading', rows: 1, columns: 50,
+    html: function() {
+      const langs = window.reportedLanguages || [];
+      if (!Array.isArray(langs) || langs.length === 0) {
+        return "<p><br><br><br>कोई भाषा दर्ज नहीं की गई। कृपया पिछला प्रश्न पूरा करें और आगे बढ़ें।</p>";
+      }
+
+      const inputs = langs
+        .map((lang, index) => `
+          <label for="confidence_${index}">${lang} के लिए आत्मविश्वास (1-5):</label>
+          <input type="number" id="confidence_${index}" name="confidence_${index}" min="1" max="5" required><br><br>
+        `)
+        .join("");
+
+      return `
+        <p><br><br><br>कृपया आपने ऊपर सूचीबद्ध प्रत्येक भाषा के लिए 1 से 5 के बीच आत्मविश्वास स्तर दर्ज करें।</p>
+        ${inputs}
+      `;
+    },
+    data: {
+        typeoftrial: 'demographics',
+    },
+    on_finish: function(data){
+        const responses = data.response || {};
+        const langs = Array.isArray(window.reportedLanguages) ? window.reportedLanguages : [];
+        const confidence = {};
+
+        langs.forEach((lang, index) => {
+          const key = `confidence_${index}`;
+          if (responses[key] !== undefined) {
+            confidence[lang] = responses[key];
+          }
+        });
+
+        data.language_confidence = confidence;
+    }
+    };
+
+
+var additional_info_question = {
+    type: jsPsychSurveyText,
+    questions: [
+        {prompt: "<br><br><br>क्या कोई और बात है जो हमें पता होनी चाहिए, जिसने प्रयोग के दौरान आपके प्रदर्शन को प्रभावित किया हो? (जैसे, नींद की कमी, बीमार महसूस करना आदि)", name: 'additional_info'}
+    ],
+    data: {
+        typeoftrial: 'demographics'
+    },
+    on_finish: function(data){
+        data.other_info = data.response.additional_info
+    }
+};
+
+var follow_up_questions = {
+  type: jsPsychSurveyHtmlForm,
+  preamble: "<h2><br><br><br>अनुवर्ती प्रश्न</h2>", name: 'heading', rows: 1, columns: 50,
+  preamble: "<br><br><br>You indicated that English is not your first language. Please answer the following questions:<br><br>",
+  html: `
+    <label for="first_language_detail">What is your first language?</label>
+    <input type="text" id="first_language" name="first_language" required><br><br>
+    
+    <label for="age_learned_english">At what age did you learn English?</label>
+    <input type="number" id="age_learned_english" name="age_learned_english" min="0" max="120" required><br><br>
+  `,
+  data: {
+        typeoftrial: 'follow_up_demographics'
+    },
+    on_finish: function(data){
+        data.first_language = data.response.first_language
+        data.age_learned_english = data.response.age_learned_english
+    }
+};
+
+var follow_up_procedure = {
+        timeline: [follow_up_questions],
+    conditional_function: function() {
+        var lastTrialData = jsPsych.data.get().last(1).values()[0];
+        //console.log("lastTrialData=",lastTrialData)
+        return lastTrialData.response === 1;
+    }
+};
+
+
+var demographics = {
+  timeline: [demographics_intro, demographics_survey1, demographics_survey2, demographics_survey3, demographics_survey4, demographics_survey5, follow_up_procedure]
+};
+
+var save_data = {
+    type: jsPsychCallFunction,
+    func: function(){saveData(subject_id+".csv",
+      jsPsych.data.get().csv())}
+  }
+
+
+function saveData(filename, filedata){
+  	$.ajax({
+  		type:'post',
+  		cache: false,
+  		url: 'save_data.php', // this is the path to the above PHP script
+      //url: https://script.google.com/macros/s/AKfycbzV--xTooSkBLufMs4AnrCTdwZxVNtycTE4JNtaCze2UijXAg8/exec
+  		data: {filename: filename, filedata: filedata}})
+  };
+
+  timeline.push(maininstructions);
+    timeline.push(
+    VFTInstructions,
+    VFTRedo("furniture-practice", "आप <strong>फर्नीचर</strong> से जुड़ी जितनी ज़्यादा चीज़ों के नाम बता सकते हैं, बताएं।", 10000),
+    SpAMInstructions,
+    SpamTask("furniture-practice")
+  );
+  timeline.push(startInstructions);
+
+//randomizes trials 
+function randomize(array) {
+  for (let index = array.length - 1; index > 0; index--) {
+    const randomindex = Math.floor(Math.random() * (index + 1));
+    [array[index], array[randomindex]] = [array[randomindex], array[index]]
+  }
+}
+
+const trials = [
+  
+  [
+    VFTRedo("animals", "आप <strong>जानवरों</strong> के जितने ज़्यादा नाम बता सकते हैं, बताएं।", 10000),
+    betweenVFTAndSpAMInstructions,
+    SpamTask("animals"),
+  ],
+  // [
+  //   VFTRedo("foods", "Name as many <strong>FOODS</strong> as you can.", 10000),
+  //   betweenVFTAndSpAMInstructions,
+  //   SpamTask("foods"),
+  // ],
+];
+
+  randomize(trials);
+  trials.forEach((block, index) => {
+
+    if (index < trials.length - 1) {
+      block.push(afterSpAMInstructions)
+    }
+    timeline.push(...block);
+  });
+  timeline.push(demographics);
+  timeline.push(save_data);
+  timeline.push(endexperiment);
+
+  jsPsych.run(timeline);
+
+
+    </script>
+  </body>
+</html>
