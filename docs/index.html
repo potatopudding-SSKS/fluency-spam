@@ -824,6 +824,56 @@
                 },
             };
 
+            var extra_questions = {
+                type: jsPsychSurveyHtmlForm,
+                preamble: "<h2><br><br><br>अनुवर्ती प्रश्न</h2>",
+                name: "heading",
+                rows: 1,
+                columns: 50,
+                html: `
+                    <label>What strategies, if any, did you use while attempting this task?</label>
+                    <input type="text" id="strategies" name="strategies" optional><br><br>
+
+                    <label>How comfortable are you at reading Hindi?</label>
+                    <label><input type="radio" name="Hi_Read" value="1" required> 1</label>
+                    <label><input type="radio" name="Hi_Read" value="2"> 2</label>
+                    <label><input type="radio" name="Hi_Read" value="3"> 3</label>
+                    <label><input type="radio" name="Hi_Read" value="4"> 4</label>
+                    <label><input type="radio" name="Hi_Read" value="5"> 5</label><br>
+
+                    <label>How comfortable are you at writing in Hindi?</label>
+                    <label><input type="radio" name="Hi_Write" value="1" required> 1</label>
+                    <label><input type="radio" name="Hi_Write" value="2"> 2</label>
+                    <label><input type="radio" name="Hi_Write" value="3"> 3</label>
+                    <label><input type="radio" name="Hi_Write" value="4"> 4</label>
+                    <label><input type="radio" name="Hi_Write" value="5"> 5</label><br>
+
+                    <label>How comfortable are you at reading English?</label>
+                    <label><input type="radio" name="En_Read" value="1" required> 1</label>
+                    <label><input type="radio" name="En_Read" value="2"> 2</label>
+                    <label><input type="radio" name="En_Read" value="3"> 3</label>
+                    <label><input type="radio" name="En_Read" value="4"> 4</label>
+                    <label><input type="radio" name="En_Read" value="5"> 5</label><br>
+
+                    <label>How comfortable are you at writing in English?</label>
+                    <label><input type="radio" name="En_Write" value="1" required> 1</label>
+                    <label><input type="radio" name="En_Write" value="2"> 2</label>
+                    <label><input type="radio" name="En_Write" value="3"> 3</label>
+                    <label><input type="radio" name="En_Write" value="4"> 4</label>
+                    <label><input type="radio" name="En_Write" value="5"> 5</label><br>
+                `,
+                data: {
+                    typeoftrial: "insights",
+                },
+                on_finish: function (data) {
+                    data.strategies = data.response.strategies;
+                    data.Hi_Read = data.response.Hi_Read;
+                    data.Hi_Write = data.response.Hi_Write;
+                    data.En_Read = data.response.En_Read;
+                    data.En_Write = data.response.En_Write;
+                }
+            }
+
             // demographics
             var demographics_intro = {
                 type: jsPsychInstructions,
@@ -1105,6 +1155,7 @@
                     demographics_survey1,
                     demographics_survey2,
                     demographics_survey3,
+                    extra_questions,
                     demographics_survey4,
                     demographics_survey5,
                     follow_up_procedure,
