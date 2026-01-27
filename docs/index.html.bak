@@ -197,170 +197,170 @@
 
             // Google Input Tools API transliteration function
             /* TRANSLITERATION KEYBOARD COMMENTED OUT
-            async function transliterateToHindi(text) {
-            if (!text || text.trim() === '') return [];
+async function transliterateToHindi(text) {
+  if (!text || text.trim() === '') return [];
+  
+  try {
+    const url = `https://inputtools.google.com/request?text=${encodeURIComponent(text)}&itc=hi-t-i0-und&num=5&cp=0&cs=1&ie=utf-8&oe=utf-8`;
+    const response = await fetch(url);
+    const data = await response.json();
+    
+    if (data[0] === 'SUCCESS' && data[1] && data[1][0] && data[1][0][1] && data[1][0][1].length > 0) {
+      return data[1][0][1].slice(0, 5); // Return top 5 suggestions
+    }
+    return [];
+  } catch (error) {
+    console.error('Transliteration error:', error);
+    return [];
+  }
+}
+*/
 
-            try {
-                const url = `https://inputtools.google.com/request?text=${encodeURIComponent(text)}&itc=hi-t-i0-und&num=5&cp=0&cs=1&ie=utf-8&oe=utf-8`;
-                const response = await fetch(url);
-                const data = await response.json();
+            // Create and manage suggestion dropdown
+            /* TRANSLITERATION KEYBOARD COMMENTED OUT
+function createSuggestionDropdown(inputElement) {
+  let dropdown = document.getElementById('transliteration-dropdown');
+  if (!dropdown) {
+    dropdown = document.createElement('div');
+    dropdown.id = 'transliteration-dropdown';
+    dropdown.style.cssText = `
+      position: absolute;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      max-height: 200px;
+      overflow-y: auto;
+      z-index: 10000;
+      display: none;
+    `;
+    document.body.appendChild(dropdown);
+  }
+  return dropdown;
+}
+*/
 
-                if (data[0] === 'SUCCESS' && data[1] && data[1][0] && data[1][0][1] && data[1][0][1].length > 0) {
-                return data[1][0][1].slice(0, 5); // Return top 5 suggestions
-                }
-                return [];
-            } catch (error) {
-                console.error('Transliteration error:', error);
-                return [];
-            }
-            }
-            */
+            /* TRANSLITERATION KEYBOARD COMMENTED OUT
+function showSuggestions(inputElement, suggestions) {
+  const dropdown = createSuggestionDropdown(inputElement);
+  dropdown.innerHTML = '';
+  
+  if (suggestions.length === 0) {
+    dropdown.style.display = 'none';
+    return;
+  }
+  
+  suggestions.forEach((suggestion, index) => {
+    const item = document.createElement('div');
+    item.textContent = suggestion;
+    item.style.cssText = `
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 16px;
+    `;
+    item.dataset.index = index;
+    
+    item.addEventListener('mouseenter', function() {
+      dropdown.querySelectorAll('div').forEach(el => el.style.backgroundColor = 'white');
+      this.style.backgroundColor = '#e3f2fd';
+    });
+    
+    item.addEventListener('click', function() {
+      inputElement.value = suggestion;
+      dropdown.style.display = 'none';
+      inputElement.focus();
+    });
+    
+    dropdown.appendChild(item);
+  });
+  
+  // Position dropdown
+  const rect = inputElement.getBoundingClientRect();
+  dropdown.style.left = rect.left + 'px';
+  dropdown.style.top = (rect.bottom + 2) + 'px';
+  dropdown.style.width = rect.width + 'px';
+  dropdown.style.display = 'block';
+  
+  // Highlight first item
+  if (dropdown.firstChild) {
+    dropdown.firstChild.style.backgroundColor = '#e3f2fd';
+  }
+}
+*/
 
-                        // Create and manage suggestion dropdown
-                        /* TRANSLITERATION KEYBOARD COMMENTED OUT
-            function createSuggestionDropdown(inputElement) {
-            let dropdown = document.getElementById('transliteration-dropdown');
-            if (!dropdown) {
-                dropdown = document.createElement('div');
-                dropdown.id = 'transliteration-dropdown';
-                dropdown.style.cssText = `
-                position: absolute;
-                background: white;
-                border: 1px solid #ccc;
-                border-radius: 4px;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-                max-height: 200px;
-                overflow-y: auto;
-                z-index: 10000;
-                display: none;
-                `;
-                document.body.appendChild(dropdown);
-            }
-            return dropdown;
-            }
-            */
+            /* TRANSLITERATION KEYBOARD COMMENTED OUT
+function hideSuggestions() {
+  const dropdown = document.getElementById('transliteration-dropdown');
+  if (dropdown) dropdown.style.display = 'none';
+}
+*/
 
-                        /* TRANSLITERATION KEYBOARD COMMENTED OUT
-            function showSuggestions(inputElement, suggestions) {
-            const dropdown = createSuggestionDropdown(inputElement);
-            dropdown.innerHTML = '';
-
-            if (suggestions.length === 0) {
-                dropdown.style.display = 'none';
-                return;
-            }
-
-            suggestions.forEach((suggestion, index) => {
-                const item = document.createElement('div');
-                item.textContent = suggestion;
-                item.style.cssText = `
-                padding: 8px 12px;
-                cursor: pointer;
-                font-size: 16px;
-                `;
-                item.dataset.index = index;
-
-                item.addEventListener('mouseenter', function() {
-                dropdown.querySelectorAll('div').forEach(el => el.style.backgroundColor = 'white');
-                this.style.backgroundColor = '#e3f2fd';
-                });
-
-                item.addEventListener('click', function() {
-                inputElement.value = suggestion;
-                dropdown.style.display = 'none';
-                inputElement.focus();
-                });
-
-                dropdown.appendChild(item);
-            });
-
-            // Position dropdown
-            const rect = inputElement.getBoundingClientRect();
-            dropdown.style.left = rect.left + 'px';
-            dropdown.style.top = (rect.bottom + 2) + 'px';
-            dropdown.style.width = rect.width + 'px';
-            dropdown.style.display = 'block';
-
-            // Highlight first item
-            if (dropdown.firstChild) {
-                dropdown.firstChild.style.backgroundColor = '#e3f2fd';
-            }
-            }
-            */
-
-                        /* TRANSLITERATION KEYBOARD COMMENTED OUT
-            function hideSuggestions() {
-            const dropdown = document.getElementById('transliteration-dropdown');
-            if (dropdown) dropdown.style.display = 'none';
-            }
-            */
-
-                        /* TRANSLITERATION KEYBOARD COMMENTED OUT
-            function setupTransliteration(inputElement, domain) {
-            let transliterateTimeout;
-            let currentSuggestions = [];
-            let selectedIndex = 0;
-
-            inputElement.addEventListener('input', function(e) {
-                clearTimeout(transliterateTimeout);
-                const inputValue = this.value;
-
-                if (!inputValue.trim()) {
-                hideSuggestions();
-                return;
-                }
-
-                transliterateTimeout = setTimeout(async () => {
-                const suggestions = await transliterateToHindi(inputValue);
-                currentSuggestions = suggestions;
-                selectedIndex = 0;
-                showSuggestions(inputElement, suggestions);
-                }, 20);
-            });
-
-            inputElement.addEventListener('keydown', function(e) {
-                const dropdown = document.getElementById('transliteration-dropdown');
-                if (!dropdown || dropdown.style.display === 'none') return;
-
-                const items = dropdown.querySelectorAll('div');
-                if (items.length === 0) return;
-
-                if (e.key === 'ArrowDown') {
-                e.preventDefault();
-                selectedIndex = (selectedIndex + 1) % items.length;
-                items.forEach((item, idx) => {
-                    item.style.backgroundColor = idx === selectedIndex ? '#e3f2fd' : 'white';
-                });
-                } else if (e.key === 'ArrowUp') {
-                e.preventDefault();
-                selectedIndex = (selectedIndex - 1 + items.length) % items.length;
-                items.forEach((item, idx) => {
-                    item.style.backgroundColor = idx === selectedIndex ? '#e3f2fd' : 'white';
-                });
-                } else if (e.key === 'Enter' && currentSuggestions.length > 0) {
-                e.preventDefault();
-                e.stopPropagation();
-                this.value = currentSuggestions[selectedIndex];
-                hideSuggestions();
-                // Trigger the actual Enter handler
-                const enterEvent = new KeyboardEvent('keydown', {
-                    key: 'Enter',
-                    code: 'Enter',
-                    keyCode: 13,
-                    which: 13,
-                    bubbles: true
-                });
-                setTimeout(() => this.dispatchEvent(enterEvent), 10);
-                } else if (e.key === 'Escape') {
-                hideSuggestions();
-                }
-            });
-
-            inputElement.addEventListener('blur', function() {
-                setTimeout(() => hideSuggestions(), 20);
-            });
-            }
-            */
+            /* TRANSLITERATION KEYBOARD COMMENTED OUT
+function setupTransliteration(inputElement, domain) {
+  let transliterateTimeout;
+  let currentSuggestions = [];
+  let selectedIndex = 0;
+  
+  inputElement.addEventListener('input', function(e) {
+    clearTimeout(transliterateTimeout);
+    const inputValue = this.value;
+    
+    if (!inputValue.trim()) {
+      hideSuggestions();
+      return;
+    }
+    
+    transliterateTimeout = setTimeout(async () => {
+      const suggestions = await transliterateToHindi(inputValue);
+      currentSuggestions = suggestions;
+      selectedIndex = 0;
+      showSuggestions(inputElement, suggestions);
+    }, 20);
+  });
+  
+  inputElement.addEventListener('keydown', function(e) {
+    const dropdown = document.getElementById('transliteration-dropdown');
+    if (!dropdown || dropdown.style.display === 'none') return;
+    
+    const items = dropdown.querySelectorAll('div');
+    if (items.length === 0) return;
+    
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      selectedIndex = (selectedIndex + 1) % items.length;
+      items.forEach((item, idx) => {
+        item.style.backgroundColor = idx === selectedIndex ? '#e3f2fd' : 'white';
+      });
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      selectedIndex = (selectedIndex - 1 + items.length) % items.length;
+      items.forEach((item, idx) => {
+        item.style.backgroundColor = idx === selectedIndex ? '#e3f2fd' : 'white';
+      });
+    } else if (e.key === 'Enter' && currentSuggestions.length > 0) {
+      e.preventDefault();
+      e.stopPropagation();
+      this.value = currentSuggestions[selectedIndex];
+      hideSuggestions();
+      // Trigger the actual Enter handler
+      const enterEvent = new KeyboardEvent('keydown', {
+        key: 'Enter',
+        code: 'Enter',
+        keyCode: 13,
+        which: 13,
+        bubbles: true
+      });
+      setTimeout(() => this.dispatchEvent(enterEvent), 10);
+    } else if (e.key === 'Escape') {
+      hideSuggestions();
+    }
+  });
+  
+  inputElement.addEventListener('blur', function() {
+    setTimeout(() => hideSuggestions(), 20);
+  });
+}
+*/
 
             //tracks responses and reaction time, adding each to a seperate array
             function createResponseHandler(domain) {
@@ -850,7 +850,7 @@
                     <label><input type="radio" name="gender" value="Male" required> Male</label><br>
                     <label><input type="radio" name="gender" value="Female"> Female</label><br>
                     <label><input type="radio" name="gender" value="Others"> Others</label><br><br>
-
+                    
                     <label for="age">आपकी उम्र क्या है?</label>
                     <input type="number" id="age" name="age" min="0" max="120" required><br><br>
 
@@ -1082,7 +1082,7 @@
                 html: `
                     <label for="first_language_detail">What is your first language?</label>
                     <input type="text" id="first_language" name="first_language" required><br><br>
-
+                    
                     <label for="age_learned_english">At what age did you learn English?</label>
                     <input type="number" id="age_learned_english" name="age_learned_english" min="0" max="120" required><br><br>
                 `,
