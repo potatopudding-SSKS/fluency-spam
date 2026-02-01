@@ -27,7 +27,7 @@
 
         <script>
             // should be window.jsPsych (instead of var) if running in cognition.run
-            var jsPsych = initJsPsych({
+            window.jsPsych = initJsPsych({
                 display_element: "jspsych-target",
                 on_finish: function () {
                     jsPsych.data.displayData();
@@ -818,7 +818,7 @@
                     <p>Important: Please do not leave this page without clicking the button below.</p>
                 `,
                 choices: ["Finish and Save Data"],
-                button_html: '<button class="jspsych-btn">%choice%</button>',
+                button_html: '<button class="jspsych-btn" id="finish-button">%choice%</button>',
                 data: {
                     typeoftrial: "end",
                 },
@@ -1213,22 +1213,7 @@
                 ],
             };
 
-            var save_data = {
-                type: jsPsychCallFunction,
-                func: function () {
-                    saveData(subject_id + ".csv", jsPsych.data.get().csv());
-                },
-            };
-
-            function saveData(filename, filedata) {
-                $.ajax({
-                    type: "post",
-                    cache: false,
-                    url: "save_data.php", // this is the path to the above PHP script
-                    //url: https://script.google.com/macros/s/AKfycbzV--xTooSkBLufMs4AnrCTdwZxVNtycTE4JNtaCze2UijXAg8/exec
-                    data: { filename: filename, filedata: filedata },
-                });
-            }
+            // Data saving handled in jsPsych.run() on_finish callback
 
             timeline.push(maininstructions);
             timeline.push(
@@ -1279,10 +1264,21 @@
                 timeline.push(...block);
             });
             timeline.push(demographics);
-            timeline.push(save_data);
             timeline.push(endexperiment);
 
-            jsPsych.run(timeline);
+            jsPsych.run({
+                timeline: timeline,
+                on_finish: function() {
+                    // Get the data as a CSV or JSON
+                    var experimentData = jsPsych.data.get().csv(); 
+                    
+                    // Send this data to the parent window (Cognition.run)
+                    window.parent.postMessage({
+                        type: 'jspsych-data',
+                        data: experimentData
+                    }, '*');
+                }
+            });
         </script>
     </body>
 </html>
