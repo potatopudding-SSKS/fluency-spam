@@ -27,7 +27,7 @@
 
         <script>
             // should be window.jsPsych (instead of var) if running in cognition.run
-            var jsPsych = initJsPsych({
+            window.jsPsych = initJsPsych({
                 display_element: "jspsych-target",
                 on_finish: function () {
                     jsPsych.data.displayData();
@@ -818,7 +818,7 @@
                     <p>Important: Please do not leave this page without clicking the button below.</p>
                 `,
                 choices: ["Finish and Save Data"],
-                button_html: '<button class="jspsych-btn">%choice%</button>',
+                button_html: '<button class="jspsych-btn" id="finish-button">%choice%</button>',
                 data: {
                     typeoftrial: "end",
                 },
@@ -1279,7 +1279,7 @@
                 timeline.push(...block);
             });
             timeline.push(demographics);
-            timeline.push(save_data);
+            // timeline.push(save_data);
             timeline.push(endexperiment);
 
             jsPsych.run(timeline);
