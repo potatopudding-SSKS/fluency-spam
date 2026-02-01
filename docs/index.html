@@ -1214,10 +1214,18 @@
             };
 
             var save_data = {
-                type: jsPsychCallFunction,
-                func: function () {
-                    saveData(subject_id + ".csv", jsPsych.data.get().csv());
-                },
+                on_finish: function() {
+                    var finalData = jsPsych.data.get().csv();
+                    // This sends the data through the "iframe wall" to Cognition.run
+                    window.parent.postMessage({
+                        type: 'jspsych-data',
+                        data: finalData
+                    }, '*');
+                }
+                // type: jsPsychCallFunction,
+                // func: function () {
+                //     saveData(subject_id + ".csv", jsPsych.data.get().csv());
+                // },
             };
 
             function saveData(filename, filedata) {
@@ -1279,7 +1287,7 @@
                 timeline.push(...block);
             });
             timeline.push(demographics);
-            // timeline.push(save_data);
+            timeline.push(save_data);
             timeline.push(endexperiment);
 
             jsPsych.run(timeline);
