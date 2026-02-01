@@ -43,6 +43,74 @@
             //creates random subject number
             var subject_id = Math.floor(Math.random() * 100000);
 
+            //consent form
+            var consent_form = {
+                type: jsPsychSurveyHtmlForm,
+                preamble: `
+                    <div style="max-width: 800px; margin: auto; text-align: justify; line-height: 1.6;">
+                        <h2>Please read the following:</h2>
+                        <p><strong>This is a consent form for research participation.</strong> It holds valuable information about this study and what to expect if you decide to participate.</p>
+                        <p><strong>Your participation is voluntary.</strong></p>
+                        <p>Please consider the information carefully. Feel free to ask questions before making your decision to participate. If you decide to participate, you will be asked to sign this form and will receive a copy of the form.</p>
+                        
+                        <p><strong>Purpose:</strong> The purpose of the study is to investigate semantic memory organization and verbal fluency patterns in Hindi speakers.</p>
+                        
+                        <p><strong>Procedures/Tasks:</strong> You need to have a good internet connection for this experiment. For the time being, you will have to participate in two tasks:</p>
+                        <ol>
+                            <li><strong>Verbal Fluency Task:</strong> You will be shown a category name and asked to type as many words as you can from that category within a time limit.</li>
+                            <li><strong>Spatial Arrangement Task:</strong> You will organize the words you typed by arranging them spatially based on how similar they are to each other.</li>
+                        </ol>
+                        
+                        <p>Although no identifiable information will be published, the responses you provide should not have any sensitive information (e.g., relating to illegal behaviors, alcohol or drug use, sexual attitudes, mental health, etc.) nor should you disclose any information that may place you at risk of criminal or civil liability.</p>
+                        
+                        <p>You will be asked to answer questions based on the information you supplied earlier and that concludes the task.</p>
+                        
+                        <p><strong>Duration:</strong> Participating in the data collection phase of the study should take up to 30 minutes of your time. You may leave the study at any time. If you decide to stop participating in the study, there will be no penalty to you and your decision will not affect your future relationship with IIIT-Hyderabad.</p>
+                        
+                        <p><strong>Risks and Benefits:</strong> There are minimal anticipated risks to you because of participating in this study and no long-term consequences are expected. No identifiable information will be published. The data will be kept in electronic form on a secure server. You will not benefit directly from participating in the study.</p>
+                        
+                        <p><strong>Confidentiality:</strong> Efforts will be made to keep your study-related information confidential. However, there may be circumstances where this information must be released. For example, personal information on your participation in this study may be disclosed if required by state law. Also, your records may be reviewed by the following groups (as applicable to the research):</p>
+                        <ul>
+                            <li>Office for Human Research Protections or other federal, state, or international regulatory agencies.</li>
+                            <li>The IIIT (International Institute of Information Technology) Review Board or Office of Responsible Research Practices.</li>
+                            <li>The sponsor, if any, or agency supporting the study.</li>
+                        </ul>
+                        
+                        <p><strong>Participant Rights:</strong> If you are a student or employee at IIIT-Hyderabad, your decision to participate will not affect your grades or employment status.</p>
+                        
+                        <p>If you choose to participate in the study, you may drop participation at any time. By signing this form, you do not give up any personal legal rights you may have as a participant in this study.</p>
+                        
+                        <p>An Institutional Review Board responsible for human subjects' research at International Institute of Information Technology, Hyderabad (IIIT-H) reviewed this research project and found it to be acceptable, according to applicable state and federal regulations and University policies designed to protect the rights and welfare of participants in research.</p>
+                        
+                        <h3>Contacts and Questions</h3>
+                        <p>For questions, concerns, or complaints about the study you may contact:</p>
+                        <p><strong>K S Sai Sankalp</strong> (Email: <a href="mailto:kssaisankalp.davey@research.iiit.ac.in">kssaisankalp.davey@research.iiit.ac.in</a>) or<br>
+                        <strong>Vishnu Sreekumar</strong> (Email: <a href="mailto:vishnu.sreekumar@iiit.ac.in">vishnu.sreekumar@iiit.ac.in</a>) or<br>
+                        <strong>Abhilasha Kumar</strong> (Email: <a href="mailto:abhilashak9@gmail.com">abhilashak9@gmail.com</a>)</p>
+                        
+                        <h3 style="margin-top: 30px;">Signing the consent form</h3>
+                        <p>I have read (or someone has read to me) this form, and I am aware that I am being asked to participate in a research study. I have had the opportunity to ask questions and have had them answered to my satisfaction. I agree to participate in this study.</p>
+                        <p>I am not giving up any legal rights by signing this form. I will be given a copy of this form.</p>
+                        <p>By signing this form, I verify that I am 18 years of age or older.</p>
+                    </div>
+                `,
+                html: `
+                    <div style="max-width: 800px; margin: auto;">
+                        <h3>Signature *</h3>
+                        <p>Please type your name.</p>
+                        <input type="text" id="consent_signature" name="consent_signature" required style="width: 100%; padding: 8px; font-size: 16px;" placeholder="Your answer">
+                    </div>
+                `,
+                button_label: 'Submit',
+                data: {
+                    typeoftrial: "consent",
+                },
+                on_finish: function (data) {
+                    data.consent_signature = data.response.consent_signature;
+                    data.consent_timestamp = new Date().toISOString();
+                },
+            };
+
             //formats opening instruction page and tells participant about experiment
             var maininstructions = {
                 type: jsPsychHtmlButtonResponse,
@@ -1230,6 +1298,7 @@
                 });
             }
 
+            timeline.push(consent_form);
             timeline.push(maininstructions);
             timeline.push(
                 VFTInstructions,
