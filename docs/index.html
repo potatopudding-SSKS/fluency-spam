@@ -826,7 +826,7 @@
 
             var extra_questions = {
                 type: jsPsychSurveyHtmlForm,
-                preamble: "<h2><br><br><br>अनुवर्ती प्रश्न</h2>",
+                preamble: "<h2><br><br><br>Exit Poll</h2>",
                 name: "heading",
                 rows: 1,
                 columns: 50,
@@ -878,27 +878,27 @@
             var demographics_intro = {
                 type: jsPsychInstructions,
                 pages: [
-                    "<br><br><br>प्रयोग अब पूरा हो चुका है! अब हम आपसे कुछ संक्षिप्त जनसांख्यिकीय प्रश्न पूछेंगे। <br><br> हालाँकि कुछ प्रश्न अनिवार्य (*) हैं, आप उन अन्य प्रश्नों को छोड़ सकते हैं जिनका उत्तर आप नहीं देना चाहते। <br><br>अपने जवाब भरने के बाद, अगले पेज पर जाने के लिए आप कंटिन्यू दबा सकते हैं।",
+                    "<br><br><br>The experiment is now complete! Next, we will ask you a few brief demographic questions.<br><br>Although some questions are required (*), you may skip any other questions you do not wish to answer.<br><br>After entering your responses, click Continue to move to the next page.",
                 ],
                 show_clickable_nav: true,
             };
 
             var demographics_survey1 = {
                 type: jsPsychSurveyHtmlForm,
-                preamble: "<h2><br><br><br>अनुवर्ती प्रश्न</h2>",
+                preamble: "<h2><br><br><br>Follow-up Questions</h2>",
                 name: "heading",
                 rows: 1,
                 columns: 50,
                 html: `
-                    <label>आपका लिंग क्या है?</label><br>
+                    <label>What is your gender?</label><br>
                     <label><input type="radio" name="gender" value="Male" required> Male</label><br>
                     <label><input type="radio" name="gender" value="Female"> Female</label><br>
                     <label><input type="radio" name="gender" value="Others"> Others</label><br><br>
 
-                    <label for="age">आपकी उम्र क्या है?</label>
+                    <label for="age">What is your age?</label>
                     <input type="number" id="age" name="age" min="0" max="120" required><br><br>
 
-                    <label for="education">आपने कितने वर्षों की औपचारिक शिक्षा प्राप्त की है? (हाई स्कूल पास करने को 12 वर्ष मानें)</label>
+                    <label for="education">How many years of formal education have you completed? (Count high school graduation as 12 years)</label>
                     <input type="number" id="education" name="education" min="0" max="120" required><br><br>
                 `,
                 data: {
@@ -913,20 +913,20 @@
 
             var demographics_survey2 = {
                 type: jsPsychSurveyMultiChoice,
-                preamble: "<h2><br><br><br>अनुवर्ती प्रश्न</h2>",
+                preamble: "<h2><br><br><br>Follow-up Questions</h2>",
                 name: "heading",
                 rows: 1,
                 columns: 50,
                 questions: [
                     {
-                        prompt: "आपका प्रमुख हाथ कौन सा है?",
+                        prompt: "What is your dominant hand?",
                         name: "dominant_hand",
-                        options: ["दायाँ", "बायाँ", "दोनों"],
+                        options: ["Right", "Left", "Both"],
                     },
                     {
-                        prompt: "कृपया बताएं कि दिन के किस समय आप सबसे अधिक सतर्क महसूस करते हैं:",
+                        prompt: "Please indicate what time of day you feel most alert:",
                         name: "alert_time",
-                        options: ["सुबह", "दोपहर", "शाम", "कोई अंतर नहीं"],
+                        options: ["Morning", "Afternoon", "Evening", "No difference"],
                     },
                 ],
                 data: {
@@ -940,14 +940,14 @@
 
             var demographics_survey3 = {
                 type: jsPsychSurveyHtmlForm,
-                preamble: "<h2><br><br><br>अनुवर्ती प्रश्न</h2>",
+                preamble: "<h2><br><br><br>Follow-up Questions</h2>",
                 name: "heading",
                 rows: 1,
                 columns: 50,
                 html: `
-                    <label for="state_ut">आप किस भारतीय राज्य या केंद्र शासित प्रदेश से हैं?</label><br>
+                    <label for="state_ut">Which Indian state or union territory are you from?</label><br>
                     <select id="state_ut" name="state_ut" required>
-                        <option value="">--चुनें--</option>
+                        <option value="">--Select--</option>
                         <option value="Andhra Pradesh">Andhra Pradesh</option>
                         <option value="Arunachal Pradesh">Arunachal Pradesh</option>
                         <option value="Assam">Assam</option>
@@ -996,23 +996,23 @@
 
             var demographics_survey4 = {
                 type: jsPsychSurveyHtmlForm,
-                preamble: "<h2><br><br><br>अनुवर्ती प्रश्न</h2>",
+                preamble: "<h2><br><br><br>Follow-up Questions</h2>",
                 name: "heading",
                 rows: 1,
                 columns: 50,
                 html: `
-                    <label for="first_language">आपकी पहली भाषा क्या है?</label>
+                    <label for="first_language">What is your first language?</label>
                     <input type="text" id="first_language" name="first_language" required><br><br>
 
-                    <label for="language_count">आप कुल कितनी भाषाएँ जानते हैं?</label>
+                    <label for="language_count">How many languages do you know in total?</label>
                     <input type="number" id="language_count" name="language_count" min="1" max="50" required><br><br>
 
-                    <label>आप कौन-कौन सी भाषाएँ जानते हैं? भाषा टाइप करें और Enter दबाएँ:</label>
+                    <label>Which languages do you know? Type a language and press Enter:</label>
                     <div id="language-inputs" style="margin-top: 8px;">
-                        <input type="text" id="language_entry" class="language-entry" placeholder="भाषा का नाम" autocomplete="off">
+                        <input type="text" id="language_entry" class="language-entry" placeholder="Language name" autocomplete="off">
                         <input type="hidden" id="languages_buffer" name="languages_buffer" value="">
                     </div>
-                    <p style="font-size: 12px; color: gray; margin-top: 6px;">प्रत्येक भाषा टाइप करके Enter दबाएँ; बॉक्स साफ़ हो जाएगा और भाषा सूची में जुड़ जाएगी।</p>
+                    <p style="font-size: 12px; color: gray; margin-top: 6px;">Type each language and press Enter; the box will clear and the language will be added to the list.</p>
                 `,
 
                 data: {
@@ -1054,27 +1054,27 @@
 
             var demographics_survey5 = {
                 type: jsPsychSurveyHtmlForm,
-                preamble: "<h2><br><br><br>अनुवर्ती प्रश्न</h2>",
+                preamble: "<h2><br><br><br>Follow-up Questions</h2>",
                 name: "heading",
                 rows: 1,
                 columns: 50,
                 html: function () {
                     const langs = window.reportedLanguages || [];
                     if (!Array.isArray(langs) || langs.length === 0) {
-                        return "<p><br><br><br>कोई भाषा दर्ज नहीं की गई। कृपया पिछला प्रश्न पूरा करें और आगे बढ़ें।</p>";
+                        return "<p><br><br><br>No languages were entered. Please complete the previous question and continue.</p>";
                     }
 
                     const inputs = langs
                         .map(
                             (lang, index) => `
-                                <label for="confidence_${index}">${lang} के लिए आत्मविश्वास (1-5):</label>
+                                <label for="confidence_${index}">Confidence in ${lang} (1-5):</label>
                                 <input type="number" id="confidence_${index}" name="confidence_${index}" min="1" max="5" required><br><br>
                             `
                         )
                         .join("");
 
                     return `
-                        <p><br><br><br>कृपया आपने ऊपर सूचीबद्ध प्रत्येक भाषा के लिए 1 से 5 के बीच आत्मविश्वास स्तर दर्ज करें।</p>
+                        <p><br><br><br>Please enter a confidence level between 1 and 5 for each language you listed above.</p>
                         ${inputs}
                     `;
                 },
@@ -1103,7 +1103,7 @@
                 type: jsPsychSurveyText,
                 questions: [
                     {
-                        prompt: "<br><br><br>क्या कोई और बात है जो हमें पता होनी चाहिए, जिसने प्रयोग के दौरान आपके प्रदर्शन को प्रभावित किया हो? (जैसे, नींद की कमी, बीमार महसूस करना आदि)",
+                        prompt: "<br><br><br>Is there anything else we should know about that might have affected your performance during the experiment? (e.g., lack of sleep, feeling ill, etc.)",
                         name: "additional_info",
                     },
                 ],
@@ -1117,7 +1117,7 @@
 
             var follow_up_questions = {
                 type: jsPsychSurveyHtmlForm,
-                preamble: "<h2><br><br><br>अनुवर्ती प्रश्न</h2>",
+                preamble: "<h2><br><br><br>Follow-up Questions</h2>",
                 name: "heading",
                 rows: 1,
                 columns: 50,
