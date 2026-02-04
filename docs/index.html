@@ -39,7 +39,7 @@
                 measurementId: "G-4JDLVX3VTZ",
             };
             firebase.initializeApp(firebaseConfig);
-            var db = firebase.firestore();
+            window.db = firebase.firestore();
         </script>
 
         <script>
@@ -895,11 +895,8 @@
                 stimulus: `
                     <p>You have completed the experiment. Thank you for participating!</p>
                     <p>Please click <a href="https://drive.google.com/file/d/1yD8wzNc2l6z4PzHAHSpVsnpay0790VCZ/view" target="_blank" rel="noopener noreferrer">here</a> to access the debriefing form and learn more about our research.</p>
-                    <p>Please click the button below to finish the experiment and save your data.</p>
-                    <p>Important: Please do not leave this page without clicking the button below.</p>
+                    <p>You can now close this page</p>
                 `,
-                choices: ["Finish and Save Data"],
-                button_html: '<button class="jspsych-btn">%choice%</button>',
                 data: {
                     typeoftrial: "end",
                 },
@@ -924,28 +921,28 @@
                     <label>What strategies, if any, did you use while attempting this task?</label>
                     <input type="text" id="strategies" name="strategies" optional><br><br>
 
-                    <label>How comfortable are you at reading Hindi?</label>
+                    <label>How comfortable are you at reading Hindi? (*)</label>
                     <label><input type="radio" name="Hi_Read" value="1" required> 1</label>
                     <label><input type="radio" name="Hi_Read" value="2"> 2</label>
                     <label><input type="radio" name="Hi_Read" value="3"> 3</label>
                     <label><input type="radio" name="Hi_Read" value="4"> 4</label>
                     <label><input type="radio" name="Hi_Read" value="5"> 5</label><br>
 
-                    <label>How comfortable are you at writing in Hindi?</label>
+                    <label>How comfortable are you at writing in Hindi? (*)</label>
                     <label><input type="radio" name="Hi_Write" value="1" required> 1</label>
                     <label><input type="radio" name="Hi_Write" value="2"> 2</label>
                     <label><input type="radio" name="Hi_Write" value="3"> 3</label>
                     <label><input type="radio" name="Hi_Write" value="4"> 4</label>
                     <label><input type="radio" name="Hi_Write" value="5"> 5</label><br>
 
-                    <label>How comfortable are you at reading English?</label>
+                    <label>How comfortable are you at reading English? (*)</label>
                     <label><input type="radio" name="En_Read" value="1" required> 1</label>
                     <label><input type="radio" name="En_Read" value="2"> 2</label>
                     <label><input type="radio" name="En_Read" value="3"> 3</label>
                     <label><input type="radio" name="En_Read" value="4"> 4</label>
                     <label><input type="radio" name="En_Read" value="5"> 5</label><br>
 
-                    <label>How comfortable are you at writing in English?</label>
+                    <label>How comfortable are you at writing in English? (*)</label>
                     <label><input type="radio" name="En_Write" value="1" required> 1</label>
                     <label><input type="radio" name="En_Write" value="2"> 2</label>
                     <label><input type="radio" name="En_Write" value="3"> 3</label>
@@ -971,17 +968,19 @@
                 rows: 1,
                 columns: 50,
                 html: `
-                    <label for="first_language">What is your first language?</label>
+                    <label for="first_language">What is your first language? (*)</label>
                     <input type="text" id="first_language" name="first_language" required><br><br>
 
-                    <label for="language_count">How many languages do you know in total?</label>
+                    <label for="language_count">How many languages do you know in total? (*)</label>
                     <input type="number" id="language_count" name="language_count" min="1" max="50" required><br><br>
 
-                    <label>Which languages do you know? Type a language and press Enter:</label>
+                    <label>Which languages do you know? Type a language and press Enter: (*)</label>
                     <div id="language-inputs" style="margin-top: 8px;">
                         <input type="text" id="language_entry" class="language-entry" placeholder="Language Name" autocomplete="off">
-                        <input type="hidden" id="languages_buffer" name="languages_buffer" value="">
+                        <input type="hidden" id="languages_buffer" name="languages_buffer" value="" required>
                     </div>
+                    <p id="languages-error" style="font-size: 14px; color: red; margin-top: 6px; display: none;">Please enter at least one language before continuing.</p>
+                    <p id="languages-list-display" style="font-size: 12px; color: green; margin-top: 6px;"></p>
                     <p style="font-size: 12px; color: gray; margin-top: 6px;">Type each language and press Enter; the box will clear and the language will be added to the list.</p>
                 `,
 
@@ -991,10 +990,18 @@
                 on_load: function () {
                     const entry = document.getElementById("language_entry");
                     const buffer = document.getElementById("languages_buffer");
+                    const errorMsg = document.getElementById("languages-error");
+                    const listDisplay = document.getElementById("languages-list-display");
                     const languages = [];
 
                     function syncBuffer() {
                         buffer.value = languages.join("||");
+                        if (languages.length > 0) {
+                            listDisplay.textContent = "Languages entered: " + languages.join(", ");
+                            errorMsg.style.display = "none";
+                        } else {
+                            listDisplay.textContent = "";
+                        }
                     }
 
                     entry.addEventListener("keydown", function (event) {
@@ -1006,6 +1013,20 @@
                         syncBuffer();
                         entry.value = "";
                     });
+
+                    // Intercept form submission to validate languages
+                    const form = document.querySelector("#jspsych-survey-html-form");
+                    if (form) {
+                        form.addEventListener("submit", function(e) {
+                            if (languages.length === 0) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                errorMsg.style.display = "block";
+                                entry.focus();
+                                return false;
+                            }
+                        });
+                    }
                 },
                 on_finish: function (data) {
                     const responses = data.response || {};
@@ -1044,7 +1065,7 @@
                         .join("");
 
                     return `
-                        <p><br><br><br>Please enter a confidence level between 1 and 5 for each language you listed above.</p>
+                        <p><br><br><br>Please enter a confidence level between 1 and 5 for each language you listed above. (*)</p>
                         ${inputs}
                     `;
                 },
@@ -1091,7 +1112,7 @@
                         .join("");
 
                     return `
-                        <p><br><br><br>Please rank each language you listed above in order of when you acquired it.<br>Your first language (cradle speech) would be ranked 1.</p>
+                        <p><br><br><br>Please rank each language you listed above in order of when you acquired it.<br>Your first language (cradle speech) would be ranked 1. (*)</p>
                         ${inputs}
                     `;
                 },
@@ -1124,7 +1145,7 @@
                 rows: 1,
                 columns: 50,
                 html: `
-                    <br><br><br><h3>You indicated that English is not your first language. Please answer the following questions:</h3><br><br>
+                    <br><br><br><h3>You indicated that English is not your first language. Please answer the following questions: (*)</h3><br><br>
                     <label for="first_language">What is your first language?</label>
                     <input type="text" id="first_language" name="first_language" required><br><br>
 
@@ -1157,7 +1178,7 @@
                 rows: 1,
                 columns: 50,
                 html: `
-                    <label for="state_ut">Which Indian state or union territory are you from?</label><br>
+                    <label for="state_ut">Which Indian state or union territory are you from? (*)</label><br>
                     <select id="state_ut" name="state_ut" required>
                         <option value="">--Select--</option>
                         <option value="Andhra Pradesh">Andhra Pradesh</option>
@@ -1213,15 +1234,15 @@
                 rows: 1,
                 columns: 50,
                 html: `
-                    <label>What is your gender?</label><br>
+                    <label>What is your gender? (*)</label><br>
                     <label><input type="radio" name="gender" value="Male" required> Male</label><br>
                     <label><input type="radio" name="gender" value="Female"> Female</label><br>
                     <label><input type="radio" name="gender" value="Others"> Others</label><br><br>
 
-                    <label for="age">What is your age?</label>
+                    <label for="age">What is your age? (*)</label>
                     <input type="number" id="age" name="age" min="0" max="120" required><br><br>
 
-                    <label for="education">How many years of formal education have you completed? (Count high school graduation as 12 years)</label>
+                    <label for="education">How many years of formal education have you completed? (Count high school graduation as 12 years) (*)</label>
                     <input type="number" id="education" name="education" min="0" max="120" required><br><br>
                 `,
                 data: {
@@ -1295,39 +1316,62 @@
             };
 
             var save_data = {
-                type: jsPsychCallFunction,
-                async: true,
-                func: function (done) {
-                    saveData(subject_id, jsPsych.data.get().values(), done);
+                type: jsPsychHtmlButtonResponse,
+                stimulus: '<p id="save-status">Saving your data, please wait...</p>',
+                choices: [],
+                trial_duration: null,
+                on_load: function() {
+                    console.log("Save trial loaded, calling saveData...");
+                    saveData(subject_id, jsPsych.data.get().values(), function(success, msg) {
+                        var statusEl = document.getElementById('save-status');
+                        if (success) {
+                            statusEl.innerHTML = '<span style="color:green;">Data saved successfully!</span>';
+                        } else {
+                            statusEl.innerHTML = '<span style="color:red;">Save failed: ' + msg + '</span>';
+                        }
+                        setTimeout(function() {
+                            jsPsych.finishTrial();
+                        }, 1500);
+                    });
                 },
             };
 
             function saveData(subjectId, dataRows, done) {
-                if (typeof db === "undefined") {
+                console.log("saveData called with subject:", subjectId);
+                console.log("window.db defined?", typeof window.db !== "undefined");
+                console.log("firebase defined?", typeof firebase !== "undefined");
+                
+                if (typeof window.db === "undefined") {
                     console.error("Firestore is not initialized.");
                     backupData(subjectId, dataRows, "init-missing");
-                    done();
+                    done(false, "Firestore not initialized");
                     return;
                 }
 
+                // Sanitize data: Firestore doesn't accept undefined values
+                // Convert to JSON and back to replace undefined with null
+                var sanitizedData = JSON.parse(JSON.stringify(dataRows));
+
                 var payload = {
                     subject_id: subjectId,
-                    data: dataRows,
+                    data: sanitizedData,
                     created_at: firebase.firestore.FieldValue.serverTimestamp(),
                     user_agent: navigator.userAgent,
                     url: window.location.href,
                 };
+                
+                console.log("Attempting Firestore write with payload keys:", Object.keys(payload));
 
-                db.collection("fluency-spam")
+                window.db.collection("fluency-spam")
                     .add(payload)
                     .then(function (docRef) {
                         console.log("Data saved with ID:", docRef.id);
-                        done();
+                        done(true, docRef.id);
                     })
                     .catch(function (error) {
                         console.error("Failed to save data to Firestore.", error);
                         backupData(subjectId, dataRows, "firestore-failed");
-                        done();
+                        done(false, error.message || error.code || "Unknown error");
                     });
             }
 
@@ -1356,13 +1400,8 @@
             timeline.push(maininstructions);
             timeline.push(
                 VFTInstructions,
-                VFTRedo(
-                    "furniture-practice",
-                    "आप <strong>फर्नीचर</strong> से जुड़ी जितनी ज़्यादा चीज़ों के नाम बता सकते हैं, बताएं।",
-                    10000
-                ),
                 SpAMInstructions,
-                SpamTask("furniture-practice")
+                //SpamTask("furniture-practice")
             );
             timeline.push(startInstructions);
 
@@ -1379,19 +1418,20 @@
 
             const trials = [
                 [
-                    VFTRedo(
-                        "animals",
-                        "आप <strong>जानवरों</strong> के जितने ज़्यादा नाम बता सकते हैं, बताएं।",
-                        10000
-                    ),
+                    VFTRedo("animals", "आप <strong>जानवरों</strong> के जितने ज़्यादा नाम बता सकते हैं, बताएं।", 180000),
                     betweenVFTAndSpAMInstructions,
                     SpamTask("animals"),
                 ],
-                // [
-                //   VFTRedo("foods", "Name as many <strong>FOODS</strong> as you can.", 10000),
-                //   betweenVFTAndSpAMInstructions,
-                //   SpamTask("foods"),
-                // ],
+                [
+                    VFTRedo("foods", "आप <strong>खाद्य पदार्थों</strong> के जितने ज़्यादा नाम बता सकते हैं, बताएं।", 180000),
+                    betweenVFTAndSpAMInstructions,
+                    SpamTask("foods"),
+                ],
+                [
+                    VFTRedo("colours", "आप <strong>रंगों</strong> के जितने ज़्यादा नाम बता सकते हैं, बताएं।", 180000),
+                    betweenVFTAndSpAMInstructions,
+                    SpamTask("colours"),
+                ],
             ];
 
             randomize(trials);
