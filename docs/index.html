@@ -25,6 +25,34 @@
         <div id="app"></div>
         <div id="jspsych-target"></div>
 
+        <script type="module">
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+            import {
+                getFirestore,
+                addDoc,
+                collection,
+                serverTimestamp,
+            } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+
+            const firebaseConfig = {
+                apiKey: "AIzaSyClM6cU-o5-bEiDc19Hx05RM47wh0WMGR4",
+                authDomain: "fluency-spam.firebaseapp.com",
+                projectId: "fluency-spam",
+                storageBucket: "fluency-spam.firebasestorage.app",
+                messagingSenderId: "846936122339",
+                appId: "1:846936122339:web:009d4ce7f803c556f2b6d6",
+                measurementId: "G-4JDLVX3VTZ",
+            };
+
+            const app = initializeApp(firebaseConfig);
+            const db = getFirestore(app);
+
+            window.firebaseDb = db;
+            window.firebaseAddDoc = addDoc;
+            window.firebaseCollection = collection;
+            window.firebaseServerTimestamp = serverTimestamp;
+        </script>
+
         <script>
             // should be window.jsPsych (instead of var) if running in cognition.run
             var jsPsych = initJsPsych({
@@ -86,7 +114,6 @@
                         <p>For questions, concerns, or complaints about the study you may contact:</p>
                         <p><strong>K S Sai Sankalp</strong> (Email: <a href="mailto:kssaisankalp.davey@research.iiit.ac.in">kssaisankalp.davey@research.iiit.ac.in</a>) or<br>
                         <strong>Vishnu Sreekumar</strong> (Email: <a href="mailto:vishnu.sreekumar@iiit.ac.in">vishnu.sreekumar@iiit.ac.in</a>) or<br>
-                        <strong>Abhilasha Kumar</strong> (Email: <a href="mailto:abhilashak9@gmail.com">abhilashak9@gmail.com</a>)</p>
                         
                         <h3 style="margin-top: 30px;">Signing the consent form</h3>
                         <p>I have read (or someone has read to me) this form, and I am aware that I am being asked to participate in a research study. I have had the opportunity to ask questions and have had them answered to my satisfaction. I agree to participate in this study.</p>
@@ -1284,18 +1311,36 @@
             var save_data = {
                 type: jsPsychCallFunction,
                 func: function () {
-                    saveData(subject_id + ".csv", jsPsych.data.get().csv());
+                    saveData(subject_id, jsPsych.data.get().values());
                 },
             };
 
-            function saveData(filename, filedata) {
-                $.ajax({
-                    type: "post",
-                    cache: false,
-                    url: "save_data.php", // this is the path to the above PHP script
-                    //url: https://script.google.com/macros/s/AKfycbzV--xTooSkBLufMs4AnrCTdwZxVNtycTE4JNtaCze2UijXAg8/exec
-                    data: { filename: filename, filedata: filedata },
-                });
+            async function saveData(subjectId, dataRows) {
+                if (
+                    !window.firebaseDb ||
+                    !window.firebaseAddDoc ||
+                    !window.firebaseCollection
+                ) {
+                    console.error("Firestore is not initialized.");
+                    return;
+                }
+
+                try {
+                    await window.firebaseAddDoc(
+                        window.firebaseCollection(
+                            window.firebaseDb,
+                            "fluency-spam"
+                        ),
+                        {
+                            subject_id: subjectId,
+                            data: dataRows,
+                            created_at: window.firebaseServerTimestamp(),
+                            user_agent: navigator.userAgent,
+                        }
+                    );
+                } catch (error) {
+                    console.error("Failed to save data to Firestore.", error);
+                }
             }
 
             timeline.push(consent_form);
