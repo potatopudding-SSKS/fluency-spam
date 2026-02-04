@@ -58,7 +58,12 @@
             var jsPsych = initJsPsych({
                 display_element: "jspsych-target",
                 on_finish: function () {
-                    jsPsych.data.displayData();
+                    var showData = new URLSearchParams(
+                        window.location.search
+                    ).has("debug");
+                    if (showData) {
+                        jsPsych.data.displayData();
+                    }
                 },
                 on_trial_start: function (trial) {
                     jsPsych.data.addProperties({ subject: subject_id });
@@ -1310,8 +1315,9 @@
 
             var save_data = {
                 type: jsPsychCallFunction,
+                async: true,
                 func: function () {
-                    saveData(subject_id, jsPsych.data.get().values());
+                    return saveData(subject_id, jsPsych.data.get().values());
                 },
             };
 
@@ -1322,24 +1328,58 @@
                     !window.firebaseCollection
                 ) {
                     console.error("Firestore is not initialized.");
+                    backupData(subjectId, dataRows, "init-missing");
                     return;
                 }
 
+                var payload = {
+                    subject_id: subjectId,
+                    data: dataRows,
+                    created_at: window.firebaseServerTimestamp(),
+                    user_agent: navigator.userAgent,
+                    url: window.location.href,
+                };
+
+                var attempts = 0;
+                var lastError = null;
+                while (attempts < 3) {
+                    try {
+                        attempts += 1;
+                        await window.firebaseAddDoc(
+                            window.firebaseCollection(
+                                window.firebaseDb,
+                                "fluency-spam"
+                            ),
+                            payload
+                        );
+                        return;
+                    } catch (error) {
+                        lastError = error;
+                    }
+                }
+
+                console.error("Failed to save data to Firestore.", lastError);
+                backupData(subjectId, dataRows, "firestore-failed");
+            }
+
+            function backupData(subjectId, dataRows, reason) {
                 try {
-                    await window.firebaseAddDoc(
-                        window.firebaseCollection(
-                            window.firebaseDb,
-                            "fluency-spam"
-                        ),
-                        {
-                            subject_id: subjectId,
-                            data: dataRows,
-                            created_at: window.firebaseServerTimestamp(),
-                            user_agent: navigator.userAgent,
-                        }
-                    );
+                    var key =
+                        "fluency-spam-backup-" +
+                        subjectId +
+                        "-" +
+                        Date.now();
+                    var backup = {
+                        subject_id: subjectId,
+                        data: dataRows,
+                        reason: reason,
+                        created_at: new Date().toISOString(),
+                        user_agent: navigator.userAgent,
+                        url: window.location.href,
+                    };
+                    localStorage.setItem(key, JSON.stringify(backup));
                 } catch (error) {
-                    console.error("Failed to save data to Firestore.", error);
+                    console.error("Failed to write local backup.", error);
                 }
             }
 
