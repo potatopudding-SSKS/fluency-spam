@@ -25,16 +25,11 @@
         <div id="app"></div>
         <div id="jspsych-target"></div>
 
-        <script type="module">
-            import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-            import {
-                getFirestore,
-                addDoc,
-                collection,
-                serverTimestamp,
-            } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
-
-            const firebaseConfig = {
+        <!-- Firebase compat SDK (synchronous loading) -->
+        <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+        <script>
+            var firebaseConfig = {
                 apiKey: "AIzaSyClM6cU-o5-bEiDc19Hx05RM47wh0WMGR4",
                 authDomain: "fluency-spam.firebaseapp.com",
                 projectId: "fluency-spam",
@@ -43,28 +38,14 @@
                 appId: "1:846936122339:web:009d4ce7f803c556f2b6d6",
                 measurementId: "G-4JDLVX3VTZ",
             };
-
-            const app = initializeApp(firebaseConfig);
-            const db = getFirestore(app);
-
-            window.firebaseDb = db;
-            window.firebaseAddDoc = addDoc;
-            window.firebaseCollection = collection;
-            window.firebaseServerTimestamp = serverTimestamp;
+            firebase.initializeApp(firebaseConfig);
+            var db = firebase.firestore();
         </script>
 
         <script>
             // should be window.jsPsych (instead of var) if running in cognition.run
             var jsPsych = initJsPsych({
                 display_element: "jspsych-target",
-                on_finish: function () {
-                    var showData = new URLSearchParams(
-                        window.location.search
-                    ).has("debug");
-                    if (showData) {
-                        jsPsych.data.displayData();
-                    }
-                },
                 on_trial_start: function (trial) {
                     jsPsych.data.addProperties({ subject: subject_id });
                 },
@@ -1316,50 +1297,38 @@
             var save_data = {
                 type: jsPsychCallFunction,
                 async: true,
-                func: function () {
-                    return saveData(subject_id, jsPsych.data.get().values());
+                func: function (done) {
+                    saveData(subject_id, jsPsych.data.get().values(), done);
                 },
             };
 
-            async function saveData(subjectId, dataRows) {
-                if (
-                    !window.firebaseDb ||
-                    !window.firebaseAddDoc ||
-                    !window.firebaseCollection
-                ) {
+            function saveData(subjectId, dataRows, done) {
+                if (typeof db === "undefined") {
                     console.error("Firestore is not initialized.");
                     backupData(subjectId, dataRows, "init-missing");
+                    done();
                     return;
                 }
 
                 var payload = {
                     subject_id: subjectId,
                     data: dataRows,
-                    created_at: window.firebaseServerTimestamp(),
+                    created_at: firebase.firestore.FieldValue.serverTimestamp(),
                     user_agent: navigator.userAgent,
                     url: window.location.href,
                 };
 
-                var attempts = 0;
-                var lastError = null;
-                while (attempts < 3) {
-                    try {
-                        attempts += 1;
-                        await window.firebaseAddDoc(
-                            window.firebaseCollection(
-                                window.firebaseDb,
-                                "fluency-spam"
-                            ),
-                            payload
-                        );
-                        return;
-                    } catch (error) {
-                        lastError = error;
-                    }
-                }
-
-                console.error("Failed to save data to Firestore.", lastError);
-                backupData(subjectId, dataRows, "firestore-failed");
+                db.collection("fluency-spam")
+                    .add(payload)
+                    .then(function (docRef) {
+                        console.log("Data saved with ID:", docRef.id);
+                        done();
+                    })
+                    .catch(function (error) {
+                        console.error("Failed to save data to Firestore.", error);
+                        backupData(subjectId, dataRows, "firestore-failed");
+                        done();
+                    });
             }
 
             function backupData(subjectId, dataRows, reason) {
