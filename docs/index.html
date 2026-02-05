@@ -974,12 +974,13 @@
                     <label for="language_count">How many languages do you know in total? (*)</label>
                     <input type="number" id="language_count" name="language_count" min="1" max="50" required><br><br>
 
-                    <label>Which languages do you know? Type a language and press Enter: (*)</label>
+                    <label>Which languages do you know? Type a language and <strong>press Enter after each language</strong>: (*)</label>
                     <div id="language-inputs" style="margin-top: 8px;">
                         <input type="text" id="language_entry" class="language-entry" placeholder="Language Name" autocomplete="off">
                         <input type="hidden" id="languages_buffer" name="languages_buffer" value="" required>
                     </div>
-                    <p id="languages-error" style="font-size: 14px; color: red; margin-top: 6px; display: none;">Please enter at least one language before continuing.</p>
+                    <p id="languages-error" style="font-size: 14px; color: red; margin-top: 6px; display: none;">Please type out a language and <strong>press Enter</strong> to record it to the buffer.</p>
+                    <p id="languages-count-error" style="font-size: 14px; color: red; margin-top: 6px; display: none;">Enter the same number of languages as specified previously.</p>
                     <p id="languages-list-display" style="font-size: 12px; color: green; margin-top: 6px;"></p>
                     <p style="font-size: 12px; color: gray; margin-top: 6px;">Type each language and press Enter; the box will clear and the language will be added to the list.</p>
                 `,
@@ -991,17 +992,48 @@
                     const entry = document.getElementById("language_entry");
                     const buffer = document.getElementById("languages_buffer");
                     const errorMsg = document.getElementById("languages-error");
+                    const countErrorMsg = document.getElementById("languages-count-error");
                     const listDisplay = document.getElementById("languages-list-display");
+                    const countInput = document.getElementById("language_count");
                     const languages = [];
+
+                    function validateLanguages(showErrors) {
+                        const countVal = parseInt((countInput && countInput.value) || "", 10);
+                        let hasError = false;
+
+                        if (languages.length === 0) {
+                            hasError = true;
+                            if (showErrors) {
+                                errorMsg.style.display = "block";
+                            }
+                        } else {
+                            errorMsg.style.display = "none";
+                        }
+
+                        if (!Number.isNaN(countVal) && countVal > 0 && languages.length !== countVal) {
+                            hasError = true;
+                            if (showErrors) {
+                                countErrorMsg.style.display = "block";
+                            }
+                        } else {
+                            countErrorMsg.style.display = "none";
+                        }
+
+                        if (submitButton) {
+                            submitButton.disabled = hasError;
+                        }
+
+                        return !hasError;
+                    }
 
                     function syncBuffer() {
                         buffer.value = languages.join("||");
                         if (languages.length > 0) {
                             listDisplay.textContent = "Languages entered: " + languages.join(", ");
-                            errorMsg.style.display = "none";
                         } else {
                             listDisplay.textContent = "";
                         }
+                        validateLanguages(false);
                     }
 
                     entry.addEventListener("keydown", function (event) {
@@ -1014,19 +1046,29 @@
                         entry.value = "";
                     });
 
-                    // Intercept form submission to validate languages
                     const form = document.querySelector("#jspsych-survey-html-form");
+                    const submitButton = form
+                        ? form.querySelector('button[type="submit"], input[type="submit"]')
+                        : null;
+
+                    if (countInput) {
+                        countInput.addEventListener("input", function () {
+                            validateLanguages(false);
+                        });
+                    }
+
                     if (form) {
-                        form.addEventListener("submit", function(e) {
-                            if (languages.length === 0) {
+                        form.addEventListener("submit", function (e) {
+                            const isValid = validateLanguages(true);
+                            if (!isValid) {
                                 e.preventDefault();
-                                e.stopPropagation();
-                                errorMsg.style.display = "block";
                                 entry.focus();
                                 return false;
                             }
                         });
                     }
+
+                    validateLanguages(false);
                 },
                 on_finish: function (data) {
                     const responses = data.response || {};
@@ -1401,9 +1443,7 @@
             timeline.push(
                 VFTInstructions,
                 VFTRedo(
-                    "furniture-practice",
-                    "आप <strong>फर्नीचर</strong> से जुड़ी जितनी ज़्यादा चीज़ों के नाम बता सकते हैं, बताएं।",
-                    60000
+                    "furniture-practice", "आप <strong>फर्नीचर</strong> से जुड़ी जितनी ज़्यादा चीज़ों के नाम बता सकते हैं, बताएं।", 60000
                 ),
                 SpAMInstructions,
                 SpamTask("furniture-practice")
