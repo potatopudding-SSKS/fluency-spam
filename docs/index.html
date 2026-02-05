@@ -110,8 +110,9 @@
                 html: `
                     <div style="max-width: 800px; margin: auto;">
                         <h3>Signature *</h3>
-                        <p>Please type your name.</p>
-                        <input type="text" id="consent_signature" name="consent_signature" required style="width: 100%; padding: 8px; font-size: 16px;" placeholder="Your answer">
+                        <p>Please type your name and roll number.</p>
+                        <input type="text" id="consent_signature" name="consent_signature" required style="width: 100%; padding: 8px; font-size: 16px;" placeholder="Your Name">
+                        <input type="text" id="consent_signature_roll" name="consent_signature_roll" required style="width: 100%; padding: 8px; font-size: 16px;" placeholder="Your Roll No.">
                     </div>
                 `,
                 button_label: 'Submit',
@@ -120,6 +121,7 @@
                 },
                 on_finish: function (data) {
                     data.consent_signature = data.response.consent_signature;
+                    data.consent_signature_roll = data.response.consent_signature_roll
                     data.consent_timestamp = new Date().toISOString();
                 },
             };
