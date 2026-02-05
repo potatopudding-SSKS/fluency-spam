@@ -920,7 +920,7 @@
                 html: `
                     <label>What strategies, if any, did you use while attempting this task?</label>
                     <input type="text" id="strategies" name="strategies" optional><br><br>
-
+                    <p><br><br>1 - Least Comfortable<br>5 - Most Comfortable
                     <label>How comfortable are you at reading Hindi? (*)</label>
                     <label><input type="radio" name="Hi_Read" value="1" required> 1</label>
                     <label><input type="radio" name="Hi_Read" value="2"> 2</label>
@@ -1107,7 +1107,7 @@
                         .join("");
 
                     return `
-                        <p><br><br><br>Please enter a confidence level between 1 and 5 for each language you listed above. (*)</p>
+                        <p><br><br><br>Please enter a confidence level between 1 and 5 for each language you listed above. (*)<br><br>1 - Least Confident<br>5 - Most Confident</p>
                         ${inputs}
                     `;
                 },
@@ -1154,7 +1154,7 @@
                         .join("");
 
                     return `
-                        <p><br><br><br>Please rank each language you listed above in order of when you acquired it.<br>Your first language (cradle speech) would be ranked 1. (*)</p>
+                        <p><br><br><br>Please rank each language you listed above in order of when you acquired it.<br>Your first language (cradle speech) would be ranked 1. (*)<br><br>Multiple languages can have the same rank.</p>
                         ${inputs}
                     `;
                 },
