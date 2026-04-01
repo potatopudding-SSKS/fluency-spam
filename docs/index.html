@@ -56,6 +56,7 @@
 
             //creates random subject number
             var subject_id = Math.floor(Math.random() * 100000);
+            var participant_roll_number = "";
 
             //consent form
             var consent_form = {
@@ -99,7 +100,7 @@
                         <h3>Contacts and Questions</h3>
                         <p>For questions, concerns, or complaints about the study you may contact:</p>
                         <p><strong>K S Sai Sankalp</strong> (Email: <a href="mailto:kssaisankalp.davey@research.iiit.ac.in">kssaisankalp.davey@research.iiit.ac.in</a>) or<br>
-                        <strong>Vishnu Sreekumar</strong> (Email: <a href="mailto:vishnu.sreekumar@iiit.ac.in">vishnu.sreekumar@iiit.ac.in</a>)
+                        <strong>Vishnu Sreekumar</strong> (Email: <a href="mailto:vishnu.sreekumar@iiit.ac.in">vishnu.sreekumar@iiit.ac.in</a>)</p>
                         
                         <h3 style="margin-top: 30px;">Signing the consent form</h3>
                         <p>I have read (or someone has read to me) this form, and I am aware that I am being asked to participate in a research study. I have had the opportunity to ask questions and have had them answered to my satisfaction. I agree to participate in this study.</p>
@@ -121,7 +122,13 @@
                 },
                 on_finish: function (data) {
                     data.consent_signature = data.response.consent_signature;
-                    data.consent_signature_roll = data.response.consent_signature_roll
+                    data.consent_signature_roll = data.response.consent_signature_roll;
+                    participant_roll_number = String(
+                        data.response.consent_signature_roll || ""
+                    ).trim();
+                    jsPsych.data.addProperties({
+                        participant_roll_number: participant_roll_number,
+                    });
                     data.consent_timestamp = new Date().toISOString();
                 },
             };
@@ -722,6 +729,13 @@
                             document.getElementById("word-drop-area");
                         let currentIndex = 0;
                         window.WordsDropped = [];
+                        window.WordsDroppedById = {};
+                        window.WordsDropHistory = [];
+
+                        function roundTo(value, digits) {
+                            const factor = Math.pow(10, digits);
+                            return Math.round(value * factor) / factor;
+                        }
 
                         //allows dragging and tracks mouse press onto a word (or rectangle the word is in)
                         function Draggable(element, onFirstMove) {
@@ -825,25 +839,36 @@
                                         y_px /
                                         (dropRect.height - elemRect.height);
 
-                                    window.WordsDropped.push({
+                                    const dropRecord = {
                                         word: element.textContent,
                                         id: element.id,
 
                                         // raw pixel values (optional, for debugging)
-                                        x_px: x_px,
-                                        y_px: y_px,
+                                        x_px: roundTo(x_px, 2),
+                                        y_px: roundTo(y_px, 2),
 
                                         // normalized coordinates (USE THESE FOR ANALYSIS)
-                                        x_norm: x_norm,
-                                        y_norm: y_norm,
+                                        x_norm: roundTo(x_norm, 6),
+                                        y_norm: roundTo(y_norm, 6),
 
                                         // canvas size at time of drop (important metadata)
-                                        canvas_width: dropRect.width,
-                                        canvas_height: dropRect.height,
-                                    });
+                                        canvas_width: roundTo(dropRect.width, 2),
+                                        canvas_height: roundTo(dropRect.height, 2),
+
+                                        // client-side event time lets us keep only the latest drop.
+                                        moved_at_ms: roundTo(performance.now(), 2),
+                                    };
+
+                                    window.WordsDropHistory.push(dropRecord);
+                                    window.WordsDroppedById[element.id] =
+                                        dropRecord;
+                                    window.WordsDropped = Object.values(
+                                        window.WordsDroppedById
+                                    );
 
                                     if (
-                                        window.WordsDropped.length ===
+                                        Object.keys(window.WordsDroppedById)
+                                            .length ===
                                         domainWords.length
                                     ) {
                                         const button =
@@ -883,7 +908,14 @@
                     },
 
                     on_finish: function (data) {
-                        data.droppedwords = window.WordsDropped || [];
+                        data.droppedwords = Object.values(
+                            window.WordsDroppedById || {}
+                        ).sort((a, b) => {
+                            const aTag = Number(String(a.id).replace("word-", ""));
+                            const bTag = Number(String(b.id).replace("word-", ""));
+                            return aTag - bTag;
+                        });
+                        data.drop_history = window.WordsDropHistory || [];
                         data.viewport_width = window.innerWidth;
                         data.viewport_height = window.innerHeight;
                         data.device_pixel_ratio = window.devicePixelRatio;
@@ -1380,6 +1412,35 @@
                 },
             };
 
+            function getParticipantRollNumber(dataRows) {
+                if (participant_roll_number && participant_roll_number.trim() !== "") {
+                    return participant_roll_number.trim();
+                }
+
+                for (var i = dataRows.length - 1; i >= 0; i--) {
+                    var row = dataRows[i] || {};
+                    if (
+                        row.typeoftrial === "consent" &&
+                        typeof row.consent_signature_roll !== "undefined"
+                    ) {
+                        var roll = String(row.consent_signature_roll || "").trim();
+                        if (roll !== "") {
+                            participant_roll_number = roll;
+                            return roll;
+                        }
+                    }
+                }
+
+                return "";
+            }
+
+            function sanitizeRollForDocId(rollNumber) {
+                var cleaned = String(rollNumber || "").trim();
+                cleaned = cleaned.replace(/\//g, "_");
+                cleaned = cleaned.replace(/\s+/g, "_");
+                return cleaned;
+            }
+
             function saveData(subjectId, dataRows, done) {
                 console.log("saveData called with subject:", subjectId);
                 console.log("window.db defined?", typeof window.db !== "undefined");
@@ -1395,9 +1456,19 @@
                 // Sanitize data: Firestore doesn't accept undefined values
                 // Convert to JSON and back to replace undefined with null
                 var sanitizedData = JSON.parse(JSON.stringify(dataRows));
+                var rollNumber = getParticipantRollNumber(sanitizedData);
+                var participantDocId = sanitizeRollForDocId(rollNumber);
+
+                if (participantDocId === "") {
+                    console.error("Missing participant roll number; cannot build document ID.");
+                    backupData(subjectId, dataRows, "missing-roll-number");
+                    done(false, "Missing roll number");
+                    return;
+                }
 
                 var payload = {
                     subject_id: subjectId,
+                    participant_roll_number: rollNumber,
                     data: sanitizedData,
                     created_at: firebase.firestore.FieldValue.serverTimestamp(),
                     user_agent: navigator.userAgent,
@@ -1405,12 +1476,14 @@
                 };
                 
                 console.log("Attempting Firestore write with payload keys:", Object.keys(payload));
+                console.log("Using participant document ID:", participantDocId);
 
                 window.db.collection("fluency-spam")
-                    .add(payload)
-                    .then(function (docRef) {
-                        console.log("Data saved with ID:", docRef.id);
-                        done(true, docRef.id);
+                    .doc(participantDocId)
+                    .set(payload)
+                    .then(function () {
+                        console.log("Data saved with ID:", participantDocId);
+                        done(true, participantDocId);
                     })
                     .catch(function (error) {
                         console.error("Failed to save data to Firestore.", error);
@@ -1445,7 +1518,7 @@
             timeline.push(
                 VFTInstructions,
                 VFTRedo(
-                    "furniture-practice", "आप <strong>फर्नीचर</strong> से जुड़ी जितनी ज़्यादा चीज़ों के नाम बता सकते हैं, बताएं।", 60000
+                    "furniture-practice", "आप <strong>फर्नीचर</strong> से जुड़ी जितनी ज़्यादा चीज़ों के नाम बता सकते हैं, बताएं।", 10000
                 ),
                 SpAMInstructions,
                 SpamTask("furniture-practice")
@@ -1464,21 +1537,21 @@
             }
 
             const trials = [
-                [
-                    VFTRedo("animals", "आप <strong>जानवरों</strong> के जितने ज़्यादा नाम बता सकते हैं, बताएं।", 60000),
-                    betweenVFTAndSpAMInstructions,
-                    SpamTask("animals"),
-                ],
-                [
-                    VFTRedo("foods", "आप <strong>खाद्य पदार्थों</strong> के जितने ज़्यादा नाम बता सकते हैं, बताएं।", 60000),
-                    betweenVFTAndSpAMInstructions,
-                    SpamTask("foods"),
-                ],
-                [
-                    VFTRedo("body-parts", "आप <strong>शरीर के अंगों</strong> के जितने ज़्यादा नाम बता सकते हैं, बताएं।", 60000),
-                    betweenVFTAndSpAMInstructions,
-                    SpamTask("body-parts"),
-                ],
+                // [
+                //     VFTRedo("animals", "आप <strong>जानवरों</strong> के जितने ज़्यादा नाम बता सकते हैं, बताएं।", 60000),
+                //     betweenVFTAndSpAMInstructions,
+                //     SpamTask("animals"),
+                // ],
+                // [
+                //     VFTRedo("foods", "आप <strong>खाद्य पदार्थों</strong> के जितने ज़्यादा नाम बता सकते हैं, बताएं।", 60000),
+                //     betweenVFTAndSpAMInstructions,
+                //     SpamTask("foods"),
+                // ],
+                // [
+                //     VFTRedo("body-parts", "आप <strong>शरीर के अंगों</strong> के जितने ज़्यादा नाम बता सकते हैं, बताएं।", 60000),
+                //     betweenVFTAndSpAMInstructions,
+                //     SpamTask("body-parts"),
+                // ],
             ];
 
             randomize(trials);
