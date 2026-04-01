@@ -1518,7 +1518,7 @@
             timeline.push(
                 VFTInstructions,
                 VFTRedo(
-                    "furniture-practice", "आप <strong>फर्नीचर</strong> से जुड़ी जितनी ज़्यादा चीज़ों के नाम बता सकते हैं, बताएं।", 10000
+                    "furniture-practice", "आप <strong>फर्नीचर</strong> से जुड़ी जितनी ज़्यादा चीज़ों के नाम बता सकते हैं, बताएं।", 60000
                 ),
                 SpAMInstructions,
                 SpamTask("furniture-practice")
@@ -1537,21 +1537,21 @@
             }
 
             const trials = [
-                // [
-                //     VFTRedo("animals", "आप <strong>जानवरों</strong> के जितने ज़्यादा नाम बता सकते हैं, बताएं।", 60000),
-                //     betweenVFTAndSpAMInstructions,
-                //     SpamTask("animals"),
-                // ],
-                // [
-                //     VFTRedo("foods", "आप <strong>खाद्य पदार्थों</strong> के जितने ज़्यादा नाम बता सकते हैं, बताएं।", 60000),
-                //     betweenVFTAndSpAMInstructions,
-                //     SpamTask("foods"),
-                // ],
-                // [
-                //     VFTRedo("body-parts", "आप <strong>शरीर के अंगों</strong> के जितने ज़्यादा नाम बता सकते हैं, बताएं।", 60000),
-                //     betweenVFTAndSpAMInstructions,
-                //     SpamTask("body-parts"),
-                // ],
+                [
+                    VFTRedo("animals", "आप <strong>जानवरों</strong> के जितने ज़्यादा नाम बता सकते हैं, बताएं।", 60000),
+                    betweenVFTAndSpAMInstructions,
+                    SpamTask("animals"),
+                ],
+                [
+                    VFTRedo("foods", "आप <strong>खाद्य पदार्थों</strong> के जितने ज़्यादा नाम बता सकते हैं, बताएं।", 60000),
+                    betweenVFTAndSpAMInstructions,
+                    SpamTask("foods"),
+                ],
+                [
+                    VFTRedo("body-parts", "आप <strong>शरीर के अंगों</strong> के जितने ज़्यादा नाम बता सकते हैं, बताएं।", 60000),
+                    betweenVFTAndSpAMInstructions,
+                    SpamTask("body-parts"),
+                ],
             ];
 
             randomize(trials);
